@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "811207129820",
+    "project_id": "chat-chat-yamin",
+    "storage_bucket": "chat-chat-yamin.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811207129820:android:d5a5342e31b236d097d219",
+        "android_client_info": {
+          "package_name": "com.yamin.chatchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "811207129820-qpp8qr48vkv4dmeb8v41cish7atk25pv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yamin.chatchat",
+            "certificate_hash": "806c5f6b20b875f795b14824aa18fffeefebf214"
+          }
+        },
+        {
+          "client_id": "811207129820-1vepnuli7lphv13sp1e82dabk4jcmek4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaJu8-JTpjG6JEPSm1oczk5IYPUBaN92E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "811207129820-1vepnuli7lphv13sp1e82dabk4jcmek4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
