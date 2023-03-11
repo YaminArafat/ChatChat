@@ -1,0 +1,27 @@
+name: Build and Test
+
+on:
+  push:
+    branches: 
+      - develop
+      - release
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build and Test
+      env:
+          BUILD_TYPE: ${{ github.ref == 'refs/heads/release' && 'release' || 'debug' }}
+      run: ./gradlew test${{ env.BUILD_TYPE }}
