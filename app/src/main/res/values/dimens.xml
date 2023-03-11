@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="welcome_screen_app_name_size">30sp</dimen>
+    <dimen name="welcome_screen_text_icon_margin">10dp</dimen>
+    <dimen name="welcome_screen_icon_size">50dp</dimen>
+    <dimen name="welcome_screen_button_margin">30dp</dimen>
+    <dimen name="login_screen_forgot_pass_margin">15dp</dimen>
+    <dimen name="signup_screen_login_text_margin">25dp</dimen>
+    <dimen name="profile_picture_size">150dp</dimen>
+    <dimen name="border_size">2dp</dimen>
+</resources>
