@@ -1,14 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.SignUpFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
 
-</FrameLayout>
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profilePic"
+            android:layout_width="@dimen/profile_picture_size"
+            android:layout_height="@dimen/profile_picture_size"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_launcher_background"
+            app:civ_border_color="@color/white"
+            app:civ_border_width="@dimen/border_size" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+            android:layout_marginTop="@dimen/welcome_screen_button_margin"
+            android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
+            android:autofillHints="emailAddress"
+            android:hint="@string/email"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/firstName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+            android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
+            android:autofillHints="name"
+            android:hint="@string/first_name"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/lastName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+            android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
+            android:autofillHints="name"
+            android:hint="@string/last_name"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/mobile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+            android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
+            android:autofillHints="phone"
+            android:hint="@string/mobile_no"
+            android:inputType="phone" />
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+            android:autofillHints="password"
+            android:hint="@string/password"
+            android:inputType="textPassword" />
+
+        <EditText
+            android:id="@+id/confirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+            android:autofillHints="password"
+            android:hint="@string/confirm_password"
+            android:inputType="textPassword" />
+
+        <TextView
+            android:id="@+id/forgotPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="@dimen/welcome_screen_text_icon_margin"
+            android:layout_marginEnd="@dimen/signup_screen_login_text_margin"
+            android:clickable="true"
+            android:text="@string/already_have_an_account_log_in"
+            android:textColor="@color/black" />
+
+        <Button
+            android:id="@+id/signUpButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/welcome_screen_button_margin"
+            android:backgroundTint="@color/forestGreen"
+            android:text="@string/sign_up" />
+    </LinearLayout>
+
+</ScrollView>
