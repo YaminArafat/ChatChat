@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,24 +20,38 @@
             android:background="@drawable/ic_baseline_chat_24"
             android:contentDescription="@string/app_name" />
 
-        <EditText
-            android:id="@+id/userName"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/emailOrMobileLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
-            android:layout_marginVertical="@dimen/welcome_screen_button_margin"
-            android:autofillHints="emailAddress"
-            android:hint="@string/enter_email_mobile_user_name"
-            android:inputType="text" />
+            android:hint="@string/enter_email_or_mobile">
 
-        <EditText
-            android:id="@+id/logInPassword"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/emailOrMobile"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+                android:layout_marginVertical="@dimen/welcome_screen_button_margin"
+                android:autofillHints="emailAddress"
+                android:inputType="text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/logInPasswordLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
-            android:autofillHints="password"
             android:hint="@string/enter_password"
-            android:inputType="textPassword" />
+            app:passwordToggleDrawable="@drawable/ic_baseline_remove_red_eye_24"
+            app:passwordToggleEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/logInPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+                android:autofillHints="password"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -53,8 +68,7 @@
                 android:layout_marginTop="@dimen/welcome_screen_text_icon_margin"
                 android:layout_weight="1"
                 android:clickable="true"
-                android:text="@string/forgot_password"
-                android:textColor="@color/black" />
+                android:text="@string/forgot_password" />
 
             <TextView
                 android:id="@+id/signUp"
@@ -65,8 +79,7 @@
                 android:layout_weight="1"
                 android:clickable="true"
                 android:text="@string/new_here_sign_up"
-                android:textAlignment="textEnd"
-                android:textColor="@color/black" />
+                android:textAlignment="textEnd" />
         </LinearLayout>
 
         <Button

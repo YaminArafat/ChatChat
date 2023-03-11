@@ -4,7 +4,7 @@
     <string name="chat_chat">Chat Chat</string>
     <string name="log_in">Log In</string>
     <string name="sign_up">Sign Up</string>
-    <string name="enter_email_mobile_user_name">Enter Email/Mobile/User Name</string>
+    <string name="enter_email_or_mobile">Enter Email/User Name</string>
     <string name="enter_password">Enter Password</string>
     <string name="forgot_password">Forgot Password?</string>
     <string name="new_here_sign_up">New Here? Sign Up</string>
