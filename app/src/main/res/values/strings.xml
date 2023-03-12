@@ -17,4 +17,18 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="already_have_an_account_log_in">Already have an account? Log In</string>
     <string name="profile_picture">Profile Picture</string>
+    <string name="field_empty_error">This field cannot be empty</string>
+    <string name="password_not_match_error">Password does not match</string>
+    <string name="password_length_short_error">Password length must be minimum 8 character</string>
+    <string name="invalid_mobile_error">Invalid mobile no</string>
+    <string name="invalid_email_error">Invalid email address</string>
+    <string name="invalid_password_error">Invalid password</string>
+    <string name="not_supported_profile_image">This image file not supported</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="cancel">Cancel</string>
+    <string name="choose_image">Choose Image</string>
+    <string name="camera_permission_denied">Camera permission denied</string>
+    <string name="gallery_permission_denied">Gallery permission denied</string>
+    <string name="no_image_found">No image found</string>
 </resources>
