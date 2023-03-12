@@ -12,14 +12,30 @@
         android:layout_gravity="center"
         android:orientation="vertical">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profilePic"
-            android:layout_width="@dimen/profile_picture_size"
-            android:layout_height="@dimen/profile_picture_size"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_launcher_background"
-            app:civ_border_color="@color/blueOrchid"
-            app:civ_border_width="@dimen/border_size" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/profilePicErrorText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/no_image_found"
+                android:textColor="@color/red"
+                android:visibility="invisible" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profilePic"
+                android:layout_width="@dimen/profile_picture_size"
+                android:layout_height="@dimen/profile_picture_size"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:src="@drawable/ic_launcher_background"
+                app:civ_border_color="@color/blueOrchid"
+                app:civ_border_width="@dimen/border_size" />
+
+        </FrameLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/emailLayout"
