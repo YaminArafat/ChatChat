@@ -22,6 +22,7 @@
     <string name="password_length_short_error">Password length must be minimum 8 character</string>
     <string name="invalid_mobile_error">Invalid mobile no</string>
     <string name="invalid_email_error">Invalid email address</string>
+    <string name="invalid_format_error">Invalid format</string>
     <string name="invalid_password_error">Invalid password</string>
     <string name="not_supported_profile_image">This image file not supported</string>
     <string name="camera">Camera</string>
@@ -31,4 +32,6 @@
     <string name="camera_permission_denied">Camera permission denied</string>
     <string name="gallery_permission_denied">Gallery permission denied</string>
     <string name="no_image_found">No image found</string>
+    <string name="sign_up_failed">Sign Up failed. Try Again.</string>
+
 </resources>
