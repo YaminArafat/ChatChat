@@ -6,6 +6,6 @@
     <dimen name="welcome_screen_button_margin">30dp</dimen>
     <dimen name="login_screen_forgot_pass_margin">15dp</dimen>
     <dimen name="signup_screen_login_text_margin">25dp</dimen>
-    <dimen name="profile_picture_size">150dp</dimen>
+    <dimen name="profile_picture_size">200dp</dimen>
     <dimen name="border_size">2dp</dimen>
 </resources>

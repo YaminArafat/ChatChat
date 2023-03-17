@@ -42,17 +42,15 @@ class AppWelcomeScreenFragment : Fragment() {
     }
 
     private fun launchSignUpFragment() {
-        val signUpFragment = SignUpFragment()
         val fragmentManager = requireActivity().supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, signUpFragment)
+        val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, SignUpFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
 
     private fun launchLogInFragment() {
-        val logInFragment = LogInFragment()
         val fragmentManager = requireActivity().supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, logInFragment)
+        val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, LogInFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
