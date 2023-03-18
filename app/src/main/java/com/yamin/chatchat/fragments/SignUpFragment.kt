@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -22,9 +23,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import com.yamin.chatchat.R
+import com.yamin.chatchat.data.models.User
 import com.yamin.chatchat.databinding.FragmentSignUpBinding
+import java.io.File
 
 /**
  * A simple [Fragment] subclass.
@@ -37,6 +42,7 @@ class SignUpFragment : Fragment() {
     private var _viewBinding: FragmentSignUpBinding? = null
     private val viewBinding get() = _viewBinding
     private lateinit var pickOptions: Array<String>
+    private var imageFilePath: String? = null
 
     private lateinit var mAuth: FirebaseAuth
 
@@ -44,6 +50,9 @@ class SignUpFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 val intent = result.data
+                intent?.data?.let {
+                    imageFilePath = it.path
+                }
                 val imageBitmap = intent?.extras?.get("data") as Bitmap
                 viewBinding?.apply {
                     profilePic.setImageBitmap(imageBitmap)
@@ -56,6 +65,7 @@ class SignUpFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 val intent = result?.data
                 val uri = intent?.data
+                imageFilePath = uri?.path
                 viewBinding?.apply {
                     profilePic.setImageURI(uri)
                     profilePic.tag = "Gallery"
@@ -307,19 +317,62 @@ class SignUpFragment : Fragment() {
             }
             if (profilePic.tag != "Default" && mEmail.isNotBlank() && mFirstName.isNotBlank() && mLastName.isNotBlank() && mMobile.isNotBlank() && mPassword.isNotBlank() && mPassword.length >= 8 && mPassword == mConfirmPassword) {
                 valid = true
-
-                mAuth.createUserWithEmailAndPassword(mEmail, mPassword)
-                    .addOnCompleteListener {
-                        if (it.isSuccessful) {
-                            val userId = mAuth.currentUser?.uid
-                        } else {
-                            Toast.makeText(mContext, getString(R.string.sign_up_failed), Toast.LENGTH_SHORT).show()
-                        }
-                    }
+                registerUserInFirebase(mEmail, mPassword, mFirstName, mLastName, mMobile)
             }
         }
         Log.d(TAG, "Validated $valid")
         return valid
+    }
+
+    private fun registerUserInFirebase(
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        mobile: String
+    ) {
+        Log.d(TAG, "registerUserInFirebase")
+
+        mAuth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Log.d(TAG, "User create successful")
+
+                    val userId = mAuth.currentUser?.uid as String
+                    val imageFile = imageFilePath?.let { path -> File(path) }
+                    val storageRef = FirebaseStorage.getInstance().reference.child("user_images/${userId}")
+                    val uploadTask = storageRef.putFile(Uri.fromFile(imageFile))
+                    uploadTask.continueWithTask { task ->
+                        if (!task.isSuccessful) {
+                            val message = extractExceptionMessage(task.exception.toString())
+                            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                            //throw  task.exception as FirebaseNetworkException
+                        }
+                        Log.d(TAG, "Profile image upload task successful")
+                        storageRef.downloadUrl
+                    }.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.d(TAG, "Profile image download url get successful")
+
+                            val profileImageDownloadUrl = task.result.toString()
+                            val user = User(userId, email, profileImageDownloadUrl, firstName, lastName, mobile, password)
+                            val databaseRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
+                            databaseRef.setValue(user)
+                        } else {
+                            val message = extractExceptionMessage(task.exception.toString())
+                            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                } else {
+                    val message = extractExceptionMessage(it.exception.toString())
+                    Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun extractExceptionMessage(exceptionMsg: String): String {
+        return exceptionMsg.substringAfter(":").trim()
     }
 
     override fun onDestroyView() {
