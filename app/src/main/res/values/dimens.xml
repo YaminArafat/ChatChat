@@ -8,4 +8,13 @@
     <dimen name="signup_screen_login_text_margin">25dp</dimen>
     <dimen name="profile_picture_size">200dp</dimen>
     <dimen name="border_size">2dp</dimen>
+    <dimen name="common_10dp">10dp</dimen>
+    <dimen name="common_15dp">15dp</dimen>
+    <dimen name="common_20dp">20dp</dimen>
+    <dimen name="common_25dp">25dp</dimen>
+    <dimen name="common_30dp">30dp</dimen>
+    <dimen name="text_size_16sp">16sp</dimen>
+    <dimen name="text_size_18sp">18sp</dimen>
+    <dimen name="text_size_20sp">20sp</dimen>
+    <dimen name="text_size_22sp">22sp</dimen>
 </resources>

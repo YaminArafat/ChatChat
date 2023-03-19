@@ -1,7 +1,8 @@
-package com.yamin.chatchat
+package com.yamin.chatchat.activites
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.yamin.chatchat.R
 import com.yamin.chatchat.fragments.AppWelcomeScreenFragment
 
 class MainActivity : AppCompatActivity() {
@@ -12,8 +13,7 @@ class MainActivity : AppCompatActivity() {
         setWelcomeScreenFragment()
     }
 
-    private fun setWelcomeScreenFragment(){
-        val welcomeScreenFragment = AppWelcomeScreenFragment()
-        supportFragmentManager.beginTransaction().add(R.id.main_activity_fragment_container, welcomeScreenFragment).commit()
+    private fun setWelcomeScreenFragment() {
+        supportFragmentManager.beginTransaction().add(R.id.main_activity_fragment_container, AppWelcomeScreenFragment()).commit()
     }
 }
