@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -21,15 +20,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
+import androidx.lifecycle.ViewModelProvider
 import com.yamin.chatchat.R
-import com.yamin.chatchat.data.models.User
+import com.yamin.chatchat.databinding.CustomDialogPopupBinding
 import com.yamin.chatchat.databinding.FragmentSignUpBinding
-import java.io.File
+import com.yamin.chatchat.viewmodels.UserViewModel
 
 /**
  * A simple [Fragment] subclass.
@@ -39,19 +34,21 @@ import java.io.File
 class SignUpFragment : Fragment() {
 
     private lateinit var mContext: Context
-    private var _viewBinding: FragmentSignUpBinding? = null
-    private val viewBinding get() = _viewBinding
-    private lateinit var pickOptions: Array<String>
-    private var imageFilePath: String? = null
 
-    private lateinit var mAuth: FirebaseAuth
+    // View Binding
+    private var _viewBinding: FragmentSignUpBinding? = null
+    private var customDialogPopupBinding: CustomDialogPopupBinding? = null
+    private val viewBinding get() = _viewBinding
+
+    // View Models
+    private lateinit var userViewModel: UserViewModel
 
     private val cameraActivity =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 val intent = result.data
                 intent?.data?.let {
-                    imageFilePath = it.path
+                    userViewModel.setImageFilePath(it.path)
                 }
                 val imageBitmap = intent?.extras?.get("data") as Bitmap
                 viewBinding?.apply {
@@ -65,7 +62,7 @@ class SignUpFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 val intent = result?.data
                 val uri = intent?.data
-                imageFilePath = uri?.path
+                userViewModel.setImageFilePath(uri?.path)
                 viewBinding?.apply {
                     profilePic.setImageURI(uri)
                     profilePic.tag = "Gallery"
@@ -93,9 +90,7 @@ class SignUpFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG, "onCreate")
-
         super.onCreate(savedInstanceState)
-        mAuth = Firebase.auth
     }
 
     override fun onStart() {
@@ -110,9 +105,6 @@ class SignUpFragment : Fragment() {
 
         super.onAttach(context)
         mContext = context
-        pickOptions = mContext.let {
-            arrayOf(it.resources.getString(R.string.camera), it.resources.getString(R.string.gallery), it.resources.getString(R.string.cancel))
-        }
     }
 
     override fun onCreateView(
@@ -120,6 +112,8 @@ class SignUpFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         Log.d(TAG, "onCreateView")
+
+        customDialogPopupBinding = CustomDialogPopupBinding.inflate(LayoutInflater.from(mContext))
 
         _viewBinding = FragmentSignUpBinding.inflate(inflater, container, false)
         return viewBinding?.root
@@ -129,32 +123,12 @@ class SignUpFragment : Fragment() {
         Log.d(TAG, "onViewCreated")
 
         super.onViewCreated(view, savedInstanceState)
+
+        userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
+
         viewBinding?.apply {
             profilePic.setOnClickListener {
-                val builder = AlertDialog.Builder(mContext)
-                builder.setTitle(getString(R.string.choose_image))
-                builder.setItems(pickOptions) { dialog, item ->
-                    when {
-                        pickOptions[item] == getString(R.string.camera) -> {
-                            if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                                cameraPermissionActivity.launch(Manifest.permission.CAMERA)
-                            } else {
-                                openCamera()
-                            }
-                        }
-                        pickOptions[item] == getString(R.string.gallery) -> {
-                            if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                                galleryPermissionActivity.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                            } else {
-                                openGallery()
-                            }
-                        }
-                        pickOptions[item] == getString(R.string.cancel) -> {
-                            dialog.dismiss()
-                        }
-                    }
-                }
-                builder.show()
+                showDialogForChoose()
             }
             var pass = ""
             password.addTextChangedListener(object : TextWatcher {
@@ -195,13 +169,51 @@ class SignUpFragment : Fragment() {
             }
             signUpButton.setOnClickListener {
                 it.isEnabled = false
-                if (checkForSignUpValidity()) {
+                if (validateDataAndSignUpUser()) {
                     Log.d(TAG, "Sign Up Successful")
+
+                    goToLogInFragment()
                 } else {
                     Log.d(TAG, "Sign Up Unsuccessful")
+                    Toast.makeText(mContext, getString(R.string.sign_up_failed), Toast.LENGTH_SHORT).show()
                 }
                 it.isEnabled = true
             }
+        }
+    }
+
+    private fun showDialogForChoose() {
+        val customDialogPopup = AlertDialog.Builder(mContext).setView(customDialogPopupBinding?.root).create()
+        customDialogPopupBinding?.apply {
+            cameraButtonLayout.setOnClickListener {
+                openCameraOrRequestPermission()
+            }
+            galleryButtonLayout.setOnClickListener {
+                openGalleryOrRequestPermission()
+            }
+            cancelButton.setOnClickListener {
+                customDialogPopup.dismiss()
+            }
+        }
+        if (customDialogPopupBinding?.root?.parent != null) {
+            (customDialogPopupBinding?.root?.parent as ViewGroup).removeView(customDialogPopupBinding?.root)
+        }
+        customDialogPopup.show()
+    }
+
+    private fun openGalleryOrRequestPermission() {
+        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            galleryPermissionActivity.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+        } else {
+            openGallery()
+        }
+    }
+
+    private fun openCameraOrRequestPermission() {
+        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            cameraPermissionActivity.launch(Manifest.permission.CAMERA)
+        } else {
+            openCamera()
         }
     }
 
@@ -227,8 +239,8 @@ class SignUpFragment : Fragment() {
         galleryActivity.launch(intent)
     }
 
-    private fun checkForSignUpValidity(): Boolean {
-        Log.d(TAG, "checkForSignUpValidity")
+    private fun validateDataAndSignUpUser(): Boolean {
+        Log.d(TAG, "validateDataAndSignUpUser")
 
         var valid = false
         viewBinding?.apply {
@@ -317,62 +329,11 @@ class SignUpFragment : Fragment() {
             }
             if (profilePic.tag != "Default" && mEmail.isNotBlank() && mFirstName.isNotBlank() && mLastName.isNotBlank() && mMobile.isNotBlank() && mPassword.isNotBlank() && mPassword.length >= 8 && mPassword == mConfirmPassword) {
                 valid = true
-                registerUserInFirebase(mEmail, mPassword, mFirstName, mLastName, mMobile)
+                userViewModel.signUp(mEmail, mPassword, mFirstName, mLastName, mMobile)
             }
         }
         Log.d(TAG, "Validated $valid")
         return valid
-    }
-
-    private fun registerUserInFirebase(
-        email: String,
-        password: String,
-        firstName: String,
-        lastName: String,
-        mobile: String
-    ) {
-        Log.d(TAG, "registerUserInFirebase")
-
-        mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    Log.d(TAG, "User create successful")
-
-                    val userId = mAuth.currentUser?.uid as String
-                    val imageFile = imageFilePath?.let { path -> File(path) }
-                    val storageRef = FirebaseStorage.getInstance().reference.child("user_images/${userId}")
-                    val uploadTask = storageRef.putFile(Uri.fromFile(imageFile))
-                    uploadTask.continueWithTask { task ->
-                        if (!task.isSuccessful) {
-                            val message = extractExceptionMessage(task.exception.toString())
-                            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-                            //throw  task.exception as FirebaseNetworkException
-                        }
-                        Log.d(TAG, "Profile image upload task successful")
-                        storageRef.downloadUrl
-                    }.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d(TAG, "Profile image download url get successful")
-
-                            val profileImageDownloadUrl = task.result.toString()
-                            val user = User(userId, email, profileImageDownloadUrl, firstName, lastName, mobile, password)
-                            val databaseRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
-                            databaseRef.setValue(user)
-                        } else {
-                            val message = extractExceptionMessage(task.exception.toString())
-                            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                } else {
-                    val message = extractExceptionMessage(it.exception.toString())
-                    Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show()
-                }
-            }
-    }
-
-    private fun extractExceptionMessage(exceptionMsg: String): String {
-        return exceptionMsg.substringAfter(":").trim()
     }
 
     override fun onDestroyView() {
