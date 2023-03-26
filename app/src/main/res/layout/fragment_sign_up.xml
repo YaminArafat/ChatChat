@@ -4,171 +4,184 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".fragments.SignUpFragment">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:clipToPadding="false"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <FrameLayout
-            android:layout_width="wrap_content"
+        <ProgressBar
+            android:id="@+id/signUpProgressBar"
+            android:layout_width="@dimen/common_100dp"
+            android:layout_height="@dimen/common_100dp"
+            android:layout_gravity="center"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:clipToPadding="false"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/profilePicErrorText"
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/no_image_found"
-                android:textColor="@color/red"
-                android:visibility="invisible" />
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/profilePic"
-                android:layout_width="@dimen/profile_picture_size"
-                android:layout_height="@dimen/profile_picture_size"
-                android:layout_gravity="center"
-                android:background="@drawable/blue_circle"
-                android:clickable="true"
-                android:contentDescription="@string/profile_picture"
-                android:tag="Default" />
-
-        </FrameLayout>
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingTop="@dimen/common_30dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/emailLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/email">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/email"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
-                        android:layout_marginTop="@dimen/welcome_screen_button_margin"
-                        android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
-                        android:autofillHints="emailAddress"
-                        android:inputType="textEmailAddress" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/firstNameLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/first_name">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/firstName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
-                        android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
-                        android:autofillHints="name"
-                        android:inputType="text" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/lastNameLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/last_name">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/lastName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
-                        android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
-                        android:autofillHints="name"
-                        android:inputType="text" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/mobileLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/mobile_no">
-
-                    <EditText
-                        android:id="@+id/mobile"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
-                        android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
-                        android:autofillHints="phone"
-                        android:inputType="phone" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/passwordLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/password"
-                    app:passwordToggleDrawable="@drawable/ic_baseline_remove_red_eye_24"
-                    app:passwordToggleEnabled="true">
-
-                    <EditText
-                        android:id="@+id/password"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
-                        android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
-                        android:autofillHints="password"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/confirmPasswordLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/confirm_password"
-                    app:passwordToggleDrawable="@drawable/ic_baseline_remove_red_eye_24"
-                    app:passwordToggleEnabled="true">
-
-                    <EditText
-                        android:id="@+id/confirmPassword"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
-                        android:autofillHints="password"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
+                android:layout_gravity="center">
 
                 <TextView
-                    android:id="@+id/goToLogIn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_marginTop="@dimen/welcome_screen_text_icon_margin"
-                    android:layout_marginEnd="@dimen/signup_screen_login_text_margin"
-                    android:clickable="true"
-                    android:text="@string/already_have_an_account_log_in" />
-
-                <Button
-                    android:id="@+id/signUpButton"
+                    android:id="@+id/profilePicErrorText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/welcome_screen_button_margin"
-                    android:backgroundTint="@color/forestGreen"
-                    android:text="@string/sign_up" />
+                    android:text="@string/no_image_found"
+                    android:textColor="@color/red"
+                    android:visibility="invisible" />
 
-            </LinearLayout>
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/profilePic"
+                    android:layout_width="@dimen/profile_picture_size"
+                    android:layout_height="@dimen/profile_picture_size"
+                    android:layout_gravity="center"
+                    android:background="@drawable/blue_circle"
+                    android:clickable="true"
+                    android:contentDescription="@string/profile_picture"
+                    android:tag="Default" />
 
-        </ScrollView>
-    </LinearLayout>
+            </FrameLayout>
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="@dimen/common_30dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/emailLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/email">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/email"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+                            android:layout_marginTop="@dimen/welcome_screen_button_margin"
+                            android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
+                            android:autofillHints="emailAddress"
+                            android:inputType="textEmailAddress" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/firstNameLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/first_name">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/firstName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+                            android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
+                            android:autofillHints="name"
+                            android:inputType="text" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/lastNameLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/last_name">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/lastName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+                            android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
+                            android:autofillHints="name"
+                            android:inputType="text" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/mobileLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/mobile_no">
+
+                        <EditText
+                            android:id="@+id/mobile"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+                            android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
+                            android:autofillHints="phone"
+                            android:inputType="phone" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/passwordLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/password"
+                        app:passwordToggleDrawable="@drawable/ic_baseline_remove_red_eye_24"
+                        app:passwordToggleEnabled="true">
+
+                        <EditText
+                            android:id="@+id/password"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+                            android:layout_marginBottom="@dimen/welcome_screen_text_icon_margin"
+                            android:autofillHints="password"
+                            android:inputType="textPassword" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/confirmPasswordLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/confirm_password"
+                        app:passwordToggleDrawable="@drawable/ic_baseline_remove_red_eye_24"
+                        app:passwordToggleEnabled="true">
+
+                        <EditText
+                            android:id="@+id/confirmPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+                            android:autofillHints="password"
+                            android:inputType="textPassword" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:id="@+id/goToLogIn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginTop="@dimen/welcome_screen_text_icon_margin"
+                        android:layout_marginEnd="@dimen/signup_screen_login_text_margin"
+                        android:clickable="true"
+                        android:text="@string/already_have_an_account_log_in" />
+
+                    <Button
+                        android:id="@+id/signUpButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="@dimen/welcome_screen_button_margin"
+                        android:backgroundTint="@color/forestGreen"
+                        android:text="@string/sign_up" />
+
+                </LinearLayout>
+
+            </ScrollView>
+        </LinearLayout>
+
+    </FrameLayout>
 </layout>

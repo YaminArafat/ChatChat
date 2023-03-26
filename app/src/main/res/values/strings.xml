@@ -29,9 +29,10 @@
     <string name="gallery">Gallery</string>
     <string name="cancel">Cancel</string>
     <string name="choose_image">Choose Image</string>
-    <string name="camera_permission_denied">Camera permission denied, Go to Settings->Permissions</string>
-    <string name="gallery_permission_denied">Gallery permission denied, Go to Settings->Permissions</string>
+    <string name="camera_permission_denied">Camera permission denied, go to Settings->Permissions</string>
+    <string name="gallery_permission_denied">Gallery permission denied, go to Settings->Permissions</string>
     <string name="no_image_found">No image found</string>
-    <string name="sign_up_failed">Sign Up failed. Try Again.</string>
-    <string name="log_in_failed">Log In failed. Try Again.</string>
+    <string name="sign_up_failed">Sign Up failed. Try again.</string>
+    <string name="log_in_failed">Log In failed. Try again.</string>
+    <string name="image_file_error">Image file does not exists or file can\'t be read</string>
 </resources>

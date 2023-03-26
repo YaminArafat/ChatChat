@@ -6,11 +6,13 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.yamin.chatchat.data.models.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileNotFoundException
 
 class UserRepository {
 
@@ -98,27 +100,55 @@ class UserRepository {
 
     suspend fun signUpUserInFirebase(
         email: String,
-        imageFilePath: String,
+        imageData: Any,
         password: String,
         firstName: String,
         lastName: String,
         mobile: String
     ) {
         Log.d(TAG, "signUpUserInFirebase")
+        var imageFile: File? = null
+        if (imageData is String) {
+            imageFile = File(imageData)
+            Log.d(TAG, "imageData $imageData imageFile $imageFile")
+            if (!imageFile.exists()) {
+                Log.d(TAG, "Image file doesn't exists or file can't be read")
+                throw FileNotFoundException()
+            }
+        }
 
-        val authResult = mAuth.createUserWithEmailAndPassword(email, password).await()
-        val userId = authResult.user?.uid as String
+        // val imageUri = Uri.parse(imageFilePath)
+        // Log.d(TAG, "imageUri $imageUri")
+        val userId = createUser(email, password)
+        Log.d(TAG, "userId $userId")
 
-        val imageFile = File(imageFilePath)
         val storageRef = FirebaseStorage.getInstance().reference.child("user_images/${userId}")
-        storageRef.putFile(Uri.fromFile(imageFile)).await()
+        uploadImage(storageRef, if (imageData is String) imageFile else imageData)
 
-        val getDownloadUrlTask = storageRef.downloadUrl.await()
-        val profileImageDownloadUrl = getDownloadUrlTask.toString()
+        val getDownloadUriTask = storageRef.downloadUrl.await()
+        val profileImageDownloadUrl = getDownloadUriTask.toString()
+        Log.d(TAG, "profileImageDownloadUrl $profileImageDownloadUrl")
 
         val user = User(userId, email, profileImageDownloadUrl, firstName, lastName, mobile, password)
 
         databaseRef.child(userId).setValue(user).await()
+    }
+
+    private suspend fun uploadImage(storageReference: StorageReference, imageData: Any?) {
+        Log.d(TAG, "uploadImage")
+
+        if (imageData is File) {
+            storageReference.putFile(Uri.fromFile(imageData)).await()
+        } else if (imageData is ByteArray) {
+            storageReference.putBytes(imageData).await()
+        }
+    }
+
+    private suspend fun createUser(email: String, password: String): String {
+        Log.d(TAG, "createUser")
+
+        val authResult = mAuth.createUserWithEmailAndPassword(email, password).await()
+        return authResult.user?.uid as String
     }
 
 
