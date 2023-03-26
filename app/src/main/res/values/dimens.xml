@@ -13,6 +13,7 @@
     <dimen name="common_20dp">20dp</dimen>
     <dimen name="common_25dp">25dp</dimen>
     <dimen name="common_30dp">30dp</dimen>
+    <dimen name="common_100dp">100dp</dimen>
     <dimen name="text_size_16sp">16sp</dimen>
     <dimen name="text_size_18sp">18sp</dimen>
     <dimen name="text_size_20sp">20sp</dimen>

@@ -14,6 +14,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setWelcomeScreenFragment() {
-        supportFragmentManager.beginTransaction().add(R.id.main_activity_fragment_container, AppWelcomeScreenFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, AppWelcomeScreenFragment()).commit()
     }
 }

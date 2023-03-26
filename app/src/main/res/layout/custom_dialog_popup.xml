@@ -10,10 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:paddingBottom="@dimen/common_30dp"
+        android:paddingVertical="@dimen/common_30dp"
         android:text="@string/choose_image"
         android:textSize="@dimen/text_size_18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
