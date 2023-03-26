@@ -73,8 +73,10 @@ class SignUpFragment : Fragment() {
     private val cameraPermissionActivity =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
+                Log.d(TAG, "Camera permission granted")
                 openCamera()
             } else {
+                Log.d(TAG, "Camera permission not granted")
                 Toast.makeText(mContext, getString(R.string.camera_permission_denied), Toast.LENGTH_SHORT).show()
             }
         }
@@ -82,8 +84,10 @@ class SignUpFragment : Fragment() {
     private val galleryPermissionActivity =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
+                Log.d(TAG, "Gallery permission granted")
                 openGallery()
             } else {
+                Log.d(TAG, "Gallery permission granted")
                 Toast.makeText(mContext, getString(R.string.gallery_permission_denied), Toast.LENGTH_SHORT).show()
             }
         }
@@ -95,9 +99,7 @@ class SignUpFragment : Fragment() {
 
     override fun onStart() {
         Log.d(TAG, "onStart")
-
         super.onStart()
-
     }
 
     override fun onAttach(context: Context) {
@@ -135,7 +137,7 @@ class SignUpFragment : Fragment() {
                 override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                    if (s.length < 8) {
+                    if (s.isNotEmpty() &&  s.length < 8) {
                         passwordLayout.isErrorEnabled = true
                         passwordLayout.error = getString(R.string.password_length_short_error)
                     } else {
@@ -183,45 +185,60 @@ class SignUpFragment : Fragment() {
     }
 
     private fun showDialogForChoose() {
+        Log.d(TAG, "showDialogForChoose")
         val customDialogPopup = AlertDialog.Builder(mContext).setView(customDialogPopupBinding?.root).create()
         customDialogPopupBinding?.apply {
             cameraButtonLayout.setOnClickListener {
                 openCameraOrRequestPermission()
+                customDialogPopup.dismiss()
             }
             galleryButtonLayout.setOnClickListener {
                 openGalleryOrRequestPermission()
+                customDialogPopup.dismiss()
             }
             cancelButton.setOnClickListener {
                 customDialogPopup.dismiss()
             }
         }
-        if (customDialogPopupBinding?.root?.parent != null) {
-            (customDialogPopupBinding?.root?.parent as ViewGroup).removeView(customDialogPopupBinding?.root)
-        }
+        (customDialogPopupBinding?.root?.parent as? ViewGroup)?.removeView(customDialogPopupBinding?.root)
         customDialogPopup.show()
     }
 
-    private fun openGalleryOrRequestPermission() {
-        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            galleryPermissionActivity.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+    private fun openCameraOrRequestPermission() {
+        Log.d(TAG, "checkCameraPermission")
+        if (isCameraPermissionGranted()) {
+            openCamera()
         } else {
-            openGallery()
+            cameraPermissionActivity.launch(Manifest.permission.CAMERA)
         }
     }
 
-    private fun openCameraOrRequestPermission() {
-        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            cameraPermissionActivity.launch(Manifest.permission.CAMERA)
+    private fun isCameraPermissionGranted(): Boolean {
+        Log.d(TAG, "isCameraPermissionGranted")
+        return ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun openGalleryOrRequestPermission() {
+        Log.d(TAG, "openGalleryOrRequestPermission")
+        if (isGalleryPermissionGranted()) {
+            openGallery()
         } else {
-            openCamera()
+            galleryPermissionActivity.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
+    }
+
+    private fun isGalleryPermissionGranted(): Boolean {
+        Log.d(TAG, "isGalleryPermissionGranted")
+        return ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
     }
 
     private fun goToLogInFragment() {
         Log.d(TAG, "goToLogInFragment")
 
         val fragmentManager = requireActivity().supportFragmentManager
-        fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, LogInFragment()).commit()
+        val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, LogInFragment())
+        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.commit()
     }
 
     private fun openCamera() {

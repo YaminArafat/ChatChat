@@ -129,8 +129,10 @@ class LogInFragment : Fragment() {
     private fun goToSignUpFragment() {
         Log.d(TAG, "goToSignUpFragment")
 
-        val fragmentManager = requireActivity().supportFragmentManager
-        fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, SignUpFragment()).commit()
+        val fragmentManager = parentFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, SignUpFragment())
+        fragmentTransaction.addToBackStack(null)
+        fragmentTransaction.commit()
     }
 
     override fun onDestroyView() {

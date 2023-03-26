@@ -1,6 +1,7 @@
 package com.yamin.chatchat.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,8 @@ class AppWelcomeScreenFragment : Fragment() {
     private val viewBinding get() = _viewBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate")
+
         super.onCreate(savedInstanceState)
     }
 
@@ -26,12 +29,15 @@ class AppWelcomeScreenFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d(TAG, "onCreateView")
+
         _viewBinding = FragmentAppWelcomeScreenBinding.inflate(inflater, container, false)
         return viewBinding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d(TAG, "onViewCreated")
 
         viewBinding?.logInButton?.setOnClickListener {
             launchLogInFragment()
@@ -42,20 +48,26 @@ class AppWelcomeScreenFragment : Fragment() {
     }
 
     private fun launchSignUpFragment() {
-        val fragmentManager = requireActivity().supportFragmentManager
+        Log.d(TAG, "launchSignUpFragment")
+
+        val fragmentManager = parentFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, SignUpFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
 
     private fun launchLogInFragment() {
-        val fragmentManager = requireActivity().supportFragmentManager
+        Log.d(TAG, "launchLogInFragment")
+
+        val fragmentManager = parentFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, LogInFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
 
     override fun onDestroyView() {
+        Log.d(TAG, "onDestroyView")
+
         super.onDestroyView()
         _viewBinding = null
     }
