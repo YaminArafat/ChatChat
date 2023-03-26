@@ -21,10 +21,15 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.yamin.chatchat.R
 import com.yamin.chatchat.databinding.CustomDialogPopupBinding
 import com.yamin.chatchat.databinding.FragmentSignUpBinding
 import com.yamin.chatchat.viewmodels.UserViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 
 /**
  * A simple [Fragment] subclass.
@@ -40,6 +45,8 @@ class SignUpFragment : Fragment() {
     private var customDialogPopupBinding: CustomDialogPopupBinding? = null
     private val viewBinding get() = _viewBinding
 
+    private var signUpSuccess = false
+
     // View Models
     private lateinit var userViewModel: UserViewModel
 
@@ -47,14 +54,16 @@ class SignUpFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 val intent = result.data
-                intent?.data?.let {
-                    userViewModel.setImageFilePath(it.path)
-                }
                 val imageBitmap = intent?.extras?.get("data") as Bitmap
                 viewBinding?.apply {
+                    profilePic.setImageDrawable(null)
                     profilePic.setImageBitmap(imageBitmap)
                     profilePic.tag = "Camera"
                 }
+                val outputStream = ByteArrayOutputStream()
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                Log.d(TAG, "imageBitmap $imageBitmap outputStream $outputStream")
+                userViewModel.setImageData(outputStream.toByteArray())
             }
         }
     private val galleryActivity =
@@ -62,7 +71,15 @@ class SignUpFragment : Fragment() {
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 val intent = result?.data
                 val uri = intent?.data
-                userViewModel.setImageFilePath(uri?.path)
+                val imageFilePath = uri?.path
+                Log.d(TAG, "uri $uri imageFilePath $imageFilePath")
+                val correctedImageFilePath = if (imageFilePath?.startsWith("/raw/") == true) {
+                    imageFilePath.replace("/raw/", "")
+                } else {
+                    imageFilePath
+                }
+                Log.d(TAG, "correctedImageFilePath $correctedImageFilePath")
+                userViewModel.setImageData(correctedImageFilePath)
                 viewBinding?.apply {
                     profilePic.setImageURI(uri)
                     profilePic.tag = "Gallery"
@@ -100,6 +117,7 @@ class SignUpFragment : Fragment() {
     override fun onStart() {
         Log.d(TAG, "onStart")
         super.onStart()
+        observeSignUpSuccess()
     }
 
     override fun onAttach(context: Context) {
@@ -137,7 +155,7 @@ class SignUpFragment : Fragment() {
                 override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                    if (s.isNotEmpty() &&  s.length < 8) {
+                    if (s.isNotEmpty() && s.length < 8) {
                         passwordLayout.isErrorEnabled = true
                         passwordLayout.error = getString(R.string.password_length_short_error)
                     } else {
@@ -156,7 +174,7 @@ class SignUpFragment : Fragment() {
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
 
                 override fun afterTextChanged(s: Editable) {
-                    Log.d(TAG, "Editable $s $pass")
+                    // Log.d(TAG, "Editable $s $pass")
                     if (s.toString() == pass) {
                         confirmPasswordLayout.error = null
                         confirmPasswordLayout.isErrorEnabled = false
@@ -171,15 +189,23 @@ class SignUpFragment : Fragment() {
             }
             signUpButton.setOnClickListener {
                 it.isEnabled = false
-                if (validateDataAndSignUpUser()) {
-                    Log.d(TAG, "Sign Up Successful")
-
-                    goToLogInFragment()
-                } else {
-                    Log.d(TAG, "Sign Up Unsuccessful")
-                    Toast.makeText(mContext, getString(R.string.sign_up_failed), Toast.LENGTH_SHORT).show()
+                signUpProgressBar.visibility = View.VISIBLE
+                lifecycleScope.launch {
+                    val isSuccessful = withContext(Dispatchers.Main) {
+                        validateDataAndSignUpUser()
+                    }
+                    if (isSuccessful) {
+                        Log.d(TAG, "Sign Up Successful")
+                        it.isEnabled = true
+                        signUpProgressBar.visibility = View.INVISIBLE
+                        goToLogInFragment()
+                    } else {
+                        Log.d(TAG, "Sign Up Unsuccessful ${userViewModel.getErrorMessage()}")
+                        signUpProgressBar.visibility = View.INVISIBLE
+                        Toast.makeText(mContext, getString(R.string.sign_up_failed), Toast.LENGTH_SHORT).show()
+                        it.isEnabled = true
+                    }
                 }
-                it.isEnabled = true
             }
         }
     }
@@ -269,7 +295,6 @@ class SignUpFragment : Fragment() {
             val mConfirmPassword = confirmPassword.text.toString()
 
             Log.d(TAG, "Profile Pic ${profilePic.drawable} $ Email ${email.text}")
-
             if (profilePic.tag == "Default") {
                 profilePicErrorText.visibility = View.VISIBLE
                 profilePicErrorText.bringToFront()
@@ -346,11 +371,30 @@ class SignUpFragment : Fragment() {
             }
             if (profilePic.tag != "Default" && mEmail.isNotBlank() && mFirstName.isNotBlank() && mLastName.isNotBlank() && mMobile.isNotBlank() && mPassword.isNotBlank() && mPassword.length >= 8 && mPassword == mConfirmPassword) {
                 valid = true
-                userViewModel.signUp(mEmail, mPassword, mFirstName, mLastName, mMobile)
+                requireActivity().runOnUiThread {
+                    userViewModel.signUp(mEmail, mPassword, mFirstName, mLastName, mMobile)
+                }
             }
         }
         Log.d(TAG, "Validated $valid")
-        return valid
+        if (valid)
+            userViewModel.getSignUpStatus()
+        return valid && signUpSuccess
+    }
+
+    private fun observeSignUpSuccess() {
+        Log.d(TAG, "observeSignUpSuccess")
+        userViewModel.signUpSuccessful.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                signUpSuccess = true
+            }
+        }
+        Log.d(TAG, "observeSignUpSuccess $signUpSuccess")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        userViewModel.isSuccessfulSignUp()
     }
 
     override fun onDestroyView() {
