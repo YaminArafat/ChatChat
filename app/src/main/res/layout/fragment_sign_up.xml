@@ -5,15 +5,19 @@
     tools:context=".fragments.SignUpFragment">
 
     <FrameLayout
+        android:id="@+id/signUpMainLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ProgressBar
+        <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/signUpProgressBar"
-            android:layout_width="@dimen/common_100dp"
-            android:layout_height="@dimen/common_100dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:indicatorColor="@color/blueOrchid"
             android:layout_gravity="center"
-            android:visibility="invisible" />
+            android:indeterminate="true"
+            android:visibility="invisible"
+            app:indicatorSize="@dimen/common_100dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
