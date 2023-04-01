@@ -7,15 +7,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yamin.chatchat.data.models.User
 import com.yamin.chatchat.repositories.UserRepository
-import com.yamin.chatchat.utils.SuccessCallback
-import com.yamin.chatchat.utils.Type
+import com.yamin.chatchat.utils.Response
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class UserViewModel : ViewModel(), SuccessCallback {
+class UserViewModel : ViewModel() {
 
     private val userRepository = UserRepository()
+    private var disposable = CompositeDisposable()
 
-    private var imageData: Any? = null
+    private var imageData: ByteArray? = null
 
     private val _currentUser = MutableLiveData<User>()
     val currentUser: LiveData<User>
@@ -30,13 +35,35 @@ class UserViewModel : ViewModel(), SuccessCallback {
     val isSignedIn: LiveData<Boolean>
         get() = _isSignedIn
 
-    private val _signUpSuccessful = MutableLiveData<Boolean>()
-    val signUpSuccessful: LiveData<Boolean>
+    private val _signUpSuccessful = MutableLiveData<Response<Pair<Boolean, String?>>>()
+    val signUpSuccessful: LiveData<Response<Pair<Boolean, String?>>>
         get() = _signUpSuccessful
 
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String>
         get() = _errorMessage
+
+    init {
+        Log.d(TAG, "init")
+        observeSignUpStatus()
+    }
+
+    private fun observeSignUpStatus() {
+        Log.d(TAG, "observeSignUpStatus")
+
+        disposable.add(userRepository.isSignUpSuccessful
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                if (it.isOnNext) {
+                    Log.d(TAG, "_signUpSuccessful isOnNext")
+                    _signUpSuccessful.postValue(Response.Success(it.value!!))
+                } else if (it.isOnError) {
+                    Log.d(TAG, "_signUpSuccessful isOnError")
+                    _signUpSuccessful.postValue(Response.Error(it.value?.second!!))
+                }
+            })
+    }
 
     fun signUp(
         email: String,
@@ -48,36 +75,27 @@ class UserViewModel : ViewModel(), SuccessCallback {
         Log.d(TAG, "signUp")
 
         viewModelScope.launch {
-            try {
-                imageData?.let {
-                    userRepository.signUpUserInFirebase(
-                        email,
-                        it,
-                        password,
-                        firstName,
-                        lastName,
-                        mobile
-                    )
+            withContext(Dispatchers.IO) {
+                try {
+                    imageData?.let {
+                        userRepository.signUpUserInFirebase(
+                            email,
+                            it,
+                            password,
+                            firstName,
+                            lastName,
+                            mobile
+                        )
+                    }
+                    //_isSignedIn.value = true
+                    // onSuccess(Type.SIGN_UP)
+                } catch (e: Exception) {
+                    Log.d(TAG, "Sign up unsuccessful ${e.message}")
+                    //_isSignedIn.value = false
+                    // onFailure(Type.SIGN_UP, e.message.toString())
                 }
-                //_isSignedIn.value = true
-                onSuccess(Type.SIGN_UP)
-            } catch (e: Exception) {
-                Log.d(TAG, "Sign up unsuccessful ${e.message}")
-                //_isSignedIn.value = false
-                onFailure(Type.SIGN_UP, e.message.toString())
             }
         }
-    }
-
-    fun getSignUpStatus() {
-        signUpSuccessful.observeForever { success ->
-            _signUpSuccessful.postValue(success)
-        }
-    }
-
-    fun isSuccessfulSignUp(): Boolean? {
-        Log.d(TAG, "isSuccessfulSignUp ${signUpSuccessful.value}")
-        return signUpSuccessful.value
     }
 
     fun getErrorMessage(): String? {
@@ -112,7 +130,9 @@ class UserViewModel : ViewModel(), SuccessCallback {
         viewModelScope.launch {
             try {
                 val user = userRepository.getCurrentUser()
-                _currentUser.postValue(user)
+                user?.let {
+                    _currentUser.postValue(it)
+                }
             } catch (e: Exception) {
                 Log.d(TAG, "Error getting current user", e)
             }
@@ -127,13 +147,13 @@ class UserViewModel : ViewModel(), SuccessCallback {
         return currentUserId.value
     }
 
-    fun setImageData(data: Any?) {
+    fun setImageData(data: ByteArray) {
         Log.d(TAG, "setImageData")
 
         imageData = data
     }
 
-    override fun onSuccess(operationType: Type) {
+    /*override fun onSuccess(operationType: Type) {
         Log.d(TAG, "onSuccess")
 
         if (operationType == Type.SIGN_UP) {
@@ -149,7 +169,7 @@ class UserViewModel : ViewModel(), SuccessCallback {
             _signUpSuccessful.postValue(false)
             _errorMessage.postValue(message)
         }
-    }
+    }*/
 
     companion object {
         const val TAG = "UserViewModel"
