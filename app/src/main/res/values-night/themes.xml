@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme for dark mode. -->
     <style name="Theme.ChatChat" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
@@ -20,6 +20,7 @@
         <item name="android:textColor">@color/white</item>
         <!-- Text color for secondary text, such as hints or disabled views. -->
         <item name="android:textColorSecondary">@color/gray</item>
+        <!--item name="android:textColorHighlight">@color/carbonGray</item-->
         <!-- Icon color. -->
         <item name="colorOnSurface">@color/white</item>
         <!-- Surface color. -->

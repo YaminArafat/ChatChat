@@ -1,7 +1,6 @@
 package com.yamin.chatchat.repositories
 
 import android.util.Log
-import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
@@ -32,45 +31,60 @@ class UserRepository {
         mobile: String
     ) {
         Log.d(TAG, "signUpUserInFirebase")
+        try {
+            mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        Log.d(TAG, "User create successful")
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    Log.d(TAG, "User create successful")
+                        val userId = it.result?.user?.uid as String
+                        val storageRef = FirebaseStorage.getInstance().reference.child("user_images/${userId}")
+                        val uploadTask = storageRef.putBytes(imageData)
 
-                    val userId = it.result?.user?.uid as String
-                    val storageRef = FirebaseStorage.getInstance().reference.child("user_images/${userId}")
-                    val uploadTask = storageRef.putBytes(imageData)
+                        uploadTask.continueWithTask { task ->
+                            if (!task.isSuccessful) {
+                                Log.d(TAG, "Profile image upload task unsuccessful ${task.exception?.message}")
+                                notifySignUpStatus(false, task.exception?.message.toString())
+                                //throw  task.exception as Throwable
+                            }
 
-                    uploadTask.continueWithTask { task ->
-                        if (!task.isSuccessful) {
-                            Log.d(TAG, "Profile image upload task unsuccessful")
-                            notifySignUpStatus(false, task.exception?.message.toString())
-                            throw  task.exception as FirebaseNetworkException
+                            Log.d(TAG, "Profile image upload task successful")
+                            storageRef.downloadUrl
+                        }.addOnCompleteListener { task2 ->
+                            if (task2.isSuccessful) {
+                                Log.d(TAG, "Profile image download url get successful")
+
+                                val profileImageDownloadUrl = task2.result.toString()
+                                val user = User(userId, email, profileImageDownloadUrl, firstName, lastName, mobile, password)
+                                databaseRef.child(userId).setValue(user).addOnCompleteListener { finalTask ->
+                                    if (finalTask.isSuccessful) {
+                                        Log.d(TAG, "User data upload task unsuccessful")
+
+                                        notifySignUpStatus(true)
+                                    } else {
+                                        Log.d(TAG, "User data upload task unsuccessful ${finalTask.exception?.message}")
+                                        notifySignUpStatus(false, finalTask.exception?.message.toString())
+                                        //throw  task2.exception as Throwable
+                                    }
+                                }
+                            } else {
+                                Log.d(TAG, "Profile image download url get unsuccessful ${task2.exception?.message}")
+                                notifySignUpStatus(false, task2.exception?.message.toString())
+                                //throw  task2.exception as Throwable
+                            }
                         }
 
-                        Log.d(TAG, "Profile image upload task successful")
-                        storageRef.downloadUrl
-                    }.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d(TAG, "Profile image download url get successful")
-
-                            val profileImageDownloadUrl = task.result.toString()
-                            val user = User(userId, email, profileImageDownloadUrl, firstName, lastName, mobile, password)
-                            databaseRef.child(userId).setValue(user)
-                            notifySignUpStatus(true)
-                        } else {
-                            Log.d(TAG, "Profile image download url get unsuccessful")
-                            notifySignUpStatus(false, task.exception?.message.toString())
-                            throw  task.exception as FirebaseNetworkException                        }
+                    } else {
+                        Log.d(TAG, "User create unsuccessful ${it.exception?.message}")
+                        notifySignUpStatus(false, it.exception?.message.toString())
+                        //throw  it.exception as Throwable
                     }
-
-                } else {
-                    Log.d(TAG, "User create unsuccessful")
-                    notifySignUpStatus(false, it.exception?.message.toString())
-                    throw  it.exception as FirebaseException
                 }
-            }
+        } catch (e: Exception) {
+            Log.d(TAG, "signUpUserInFirebase unsuccessful ${e.message}")
+            e.printStackTrace()
+            //notifySignUpStatus(false, e.message.toString())
+        }
     }*/
 
     suspend fun logInUserToApp(emailOrMobile: String, password: String) {
@@ -94,6 +108,7 @@ class UserRepository {
                 snapshot?.getValue(User::class.java)
             } catch (e: Exception) {
                 Log.d(TAG, "Error getting current user", e)
+                e.printStackTrace()
                 null
             }
         }
@@ -130,8 +145,9 @@ class UserRepository {
 
             databaseRef.child(userId).setValue(user).await()
             notifySignUpStatus(true)
-        } catch (e: FirebaseNetworkException) {
+        } catch (e: Exception) {
             Log.d(TAG, "Exception ${e.message}")
+            e.printStackTrace()
             notifySignUpStatus(false, e.message.toString())
         }
 
@@ -139,12 +155,11 @@ class UserRepository {
 
     private fun notifySignUpStatus(status: Boolean, errorMessage: String? = null) {
         Log.d(TAG, "notifySignUpStatus status $status errorMessage $errorMessage")
-
-        if (status) {
-            _isSignUpSuccessful.onNext(Notification.createOnNext(Pair(status, null)))
-            _isSignUpSuccessful.onComplete()
-        } else
-            _isSignUpSuccessful.onError(Exception(errorMessage))
+        try {
+            _isSignUpSuccessful.onNext(Notification.createOnNext(Pair(status, errorMessage)))
+        } catch (e: Exception) {
+            _isSignUpSuccessful.onError(Throwable(e.message))
+        }
     }
 
     companion object {
