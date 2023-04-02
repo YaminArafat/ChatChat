@@ -57,12 +57,31 @@ class UserViewModel : ViewModel() {
             .subscribe {
                 if (it.isOnNext) {
                     Log.d(TAG, "_signUpSuccessful isOnNext")
-                    _signUpSuccessful.postValue(Response.Success(it.value!!))
+                    it.value?.let { status ->
+                        if (status.first) {
+                            Log.d(TAG, "isOnNext success")
+                            _signUpSuccessful.postValue(Response.Success(status))
+                        } else {
+                            Log.d(TAG, "isOnNext error")
+                            _signUpSuccessful.postValue(Response.Error(status.second!!))
+                        }
+                    }
                 } else if (it.isOnError) {
                     Log.d(TAG, "_signUpSuccessful isOnError")
                     _signUpSuccessful.postValue(Response.Error(it.value?.second!!))
                 }
             })
+    }
+
+    override fun onCleared() {
+        Log.d(TAG, "onCleared")
+        super.onCleared()
+        disposable.dispose()
+    }
+
+    fun resetSignUpStatus() {
+        Log.d(TAG, "resetSignUpStatus")
+        _signUpSuccessful.postValue(Response.Idle)
     }
 
     fun signUp(
@@ -91,6 +110,7 @@ class UserViewModel : ViewModel() {
                     // onSuccess(Type.SIGN_UP)
                 } catch (e: Exception) {
                     Log.d(TAG, "Sign up unsuccessful ${e.message}")
+                    e.printStackTrace()
                     //_isSignedIn.value = false
                     // onFailure(Type.SIGN_UP, e.message.toString())
                 }

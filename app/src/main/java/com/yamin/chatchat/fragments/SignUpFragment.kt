@@ -128,6 +128,11 @@ class SignUpFragment : Fragment() {
         super.onStart()
     }
 
+    override fun onResume() {
+        Log.d(TAG, "onResume")
+        super.onResume()
+    }
+
     override fun onAttach(context: Context) {
         Log.d(TAG, "onAttach")
 
@@ -151,6 +156,7 @@ class SignUpFragment : Fragment() {
         Log.d(TAG, "onViewCreated")
 
         super.onViewCreated(view, savedInstanceState)
+        observeSignUpStatus()
 
         viewBinding?.apply {
             profilePic.setOnClickListener {
@@ -196,7 +202,6 @@ class SignUpFragment : Fragment() {
             signUpButton.setOnClickListener {
                 Log.d(TAG, "signUpButton clicked")
                 showSignUpInProgress(true)
-                observeSignUpStatus()
                 validateDataAndSignUpUser()
 /*                lifecycleScope.launch {
                     val isSuccessful = withContext(Dispatchers.Main) {
@@ -377,10 +382,12 @@ class SignUpFragment : Fragment() {
             if (mPassword.isBlank()) {
                 passwordLayout.isErrorEnabled = true
                 passwordLayout.error = getString(R.string.field_empty_error)
+                //passwordLayout.errorIconDrawable = null
             } else {
                 if (mPassword.length < 8) {
                     passwordLayout.isErrorEnabled = true
                     passwordLayout.error = getString(R.string.password_length_short_error)
+                  //  passwordLayout.errorIconDrawable = null
                 } else {
                     passwordLayout.error = null
                     passwordLayout.isErrorEnabled = false
@@ -389,10 +396,12 @@ class SignUpFragment : Fragment() {
             if (mConfirmPassword.isBlank()) {
                 confirmPasswordLayout.isErrorEnabled = true
                 confirmPasswordLayout.error = getString(R.string.field_empty_error)
+                //confirmPasswordLayout.errorIconDrawable = null
             } else {
                 if (mPassword != mConfirmPassword) {
                     confirmPasswordLayout.isErrorEnabled = true
                     confirmPasswordLayout.error = getString(R.string.password_not_match_error)
+                   // confirmPasswordLayout.errorIconDrawable = null
                 } else {
                     confirmPasswordLayout.error = null
                     confirmPasswordLayout.isErrorEnabled = false
@@ -415,7 +424,6 @@ class SignUpFragment : Fragment() {
                 is Response.Success -> {
                     Log.d(TAG, "Sign Up Successful ${response.data}")
                     showSignUpInProgress(false)
-                    resetSignUpStatus(false)
                     goToLogInFragment()
                 }
                 is Response.Error -> {
@@ -430,25 +438,34 @@ class SignUpFragment : Fragment() {
         }
     }
 
-    private fun resetSignUpStatus(status: Boolean) {
-        userViewModel.logOut()
-    }
-
     private fun showSignUpInProgress(progress: Boolean) {
         Log.d(TAG, "showSignUpInProgress")
-
         viewBinding?.apply {
             if (progress) {
                 signUpProgressBar.visibility = View.VISIBLE
-                signUpProgressBar.show()
-                signUpMainLayout.alpha = DIM_VIEW
-                signUpMainLayout.isClickable = false
                 signUpProgressBar.bringToFront()
+                signUpMainLayout.alpha = DIM_VIEW
+                profilePic.isEnabled = false
+                email.isEnabled = false
+                firstName.isEnabled = false
+                lastName.isEnabled = false
+                mobile.isEnabled = false
+                password.isEnabled = false
+                confirmPassword.isEnabled = false
+                signUpButton.isClickable = false
+                goToLogIn.isEnabled = false
             } else {
-                signUpMainLayout.alpha = NORMAL_VIEW
-                signUpMainLayout.isClickable = true
-                signUpProgressBar.hide()
                 signUpProgressBar.visibility = View.INVISIBLE
+                signUpMainLayout.alpha = NORMAL_VIEW
+                profilePic.isEnabled = true
+                email.isEnabled = true
+                firstName.isEnabled = true
+                lastName.isEnabled = true
+                mobile.isEnabled = true
+                password.isEnabled = true
+                confirmPassword.isEnabled = true
+                goToLogIn.isEnabled = true
+                signUpButton.isClickable = true
              }
         }
     }
@@ -456,7 +473,18 @@ class SignUpFragment : Fragment() {
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView")
         super.onDestroyView()
+        userViewModel.resetSignUpStatus()
         _viewBinding = null
+    }
+
+    override fun onStop() {
+        Log.d(TAG, "onStop")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        Log.d(TAG, "onDestroy")
+        super.onDestroy()
     }
 
     companion object {
