@@ -203,22 +203,6 @@ class SignUpFragment : Fragment() {
                 Log.d(TAG, "signUpButton clicked")
                 showSignUpInProgress(true)
                 validateDataAndSignUpUser()
-/*                lifecycleScope.launch {
-                    val isSuccessful = withContext(Dispatchers.Main) {
-                        validateDataAndSignUpUser()
-                    }
-                    if (isSuccessful) {
-                        Log.d(TAG, "Sign Up Successful")
-                        it.isEnabled = true
-                        signUpProgressBar.visibility = View.INVISIBLE
-                        goToLogInFragment()
-                    } else {
-                        Log.d(TAG, "Sign Up Unsuccessful ${userViewModel.getErrorMessage()}")
-                        signUpProgressBar.visibility = View.INVISIBLE
-                        Toast.makeText(mContext, getString(R.string.sign_up_failed), Toast.LENGTH_SHORT).show()
-                        it.isEnabled = true
-                    }
-                }*/
             }
         }
     }
@@ -429,7 +413,7 @@ class SignUpFragment : Fragment() {
                 is Response.Error -> {
                     Log.d(TAG, "Sign Up Unsuccessful ${response.errorMessage}")
                     showSignUpInProgress(false)
-                    Toast.makeText(mContext, getString(R.string.sign_up_failed) + response.errorMessage, Toast.LENGTH_LONG).show()
+                    Toast.makeText(mContext, getString(R.string.sign_up_failed) + " " + response.errorMessage + " " + getString(R.string.try_again), Toast.LENGTH_LONG).show()
                 }
                 else -> {
                     Log.d(TAG, "Sign Up in progress $response")
