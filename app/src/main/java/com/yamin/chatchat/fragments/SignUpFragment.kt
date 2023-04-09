@@ -428,7 +428,7 @@ class SignUpFragment : Fragment() {
             if (progress) {
                 signUpProgressBar.visibility = View.VISIBLE
                 signUpProgressBar.bringToFront()
-                signUpMainLayout.alpha = DIM_VIEW
+                signUpCredentialsLayout.alpha = DIM_VIEW
                 profilePic.isEnabled = false
                 email.isEnabled = false
                 firstName.isEnabled = false
@@ -440,7 +440,7 @@ class SignUpFragment : Fragment() {
                 goToLogIn.isEnabled = false
             } else {
                 signUpProgressBar.visibility = View.INVISIBLE
-                signUpMainLayout.alpha = NORMAL_VIEW
+                signUpCredentialsLayout.alpha = NORMAL_VIEW
                 profilePic.isEnabled = true
                 email.isEnabled = true
                 firstName.isEnabled = true

@@ -22,6 +22,10 @@ class UserRepository {
     val isSignUpSuccessful: Observable<Notification<Pair<Boolean, String?>>>
         get() = _isSignUpSuccessful
 
+    private val _isLogInSuccessful = PublishSubject.create<Notification<Pair<Boolean, String?>>>()
+    val isLogInSuccessful: Observable<Notification<Pair<Boolean, String?>>>
+        get() = _isLogInSuccessful
+
     /*fun signUpUserInFirebase(
         email: String,
         imageData: ByteArray,
@@ -87,10 +91,18 @@ class UserRepository {
         }
     }*/
 
-    suspend fun logInUserToApp(emailOrMobile: String, password: String) {
+    suspend fun logInUser(emailOrMobile: String, password: String) {
         Log.d(TAG, "logInUserToApp")
 
-        mAuth.signInWithEmailAndPassword(emailOrMobile, password).await()
+        try {
+            mAuth.signInWithEmailAndPassword(emailOrMobile, password).await()
+            _isLogInSuccessful.onNext(Notification.createOnNext(Pair(true, null)))
+        } catch (e: Exception) {
+            Log.d(TAG, "log In failed ${e.message}")
+            e.printStackTrace()
+            _isLogInSuccessful.onNext(Notification.createOnNext(Pair(false, e.message)))
+        }
+
     }
 
     fun logOutUserFromApp() {

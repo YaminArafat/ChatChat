@@ -10,10 +10,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import com.yamin.chatchat.R
 import com.yamin.chatchat.activites.HomeActivity
 import com.yamin.chatchat.databinding.FragmentLogInBinding
+import com.yamin.chatchat.utils.DIM_VIEW
+import com.yamin.chatchat.utils.NORMAL_VIEW
+import com.yamin.chatchat.utils.Response
 import com.yamin.chatchat.viewmodels.UserViewModel
 
 /**
@@ -30,7 +33,7 @@ class LogInFragment : Fragment() {
     private val viewBinding get() = _viewBinding
 
     // View Models
-    private lateinit var userViewModel: UserViewModel
+    private val userViewModel: UserViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,38 +58,79 @@ class LogInFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.d(TAG, "onViewCreated")
 
-        userViewModel = ViewModelProvider(this)[UserViewModel::class.java]
+        observeLogInStatus()
 
         viewBinding?.apply {
-
-
             goToSignUp.setOnClickListener {
                 goToSignUpFragment()
             }
 
             logInButton.setOnClickListener {
-                if (validateDataAndLogin()) {
-                    Log.d(TAG, "Log In Successful")
-                    val loggedInUserId = userViewModel.getCurrentUserId()
-                    if (loggedInUserId != null) {
-                        launchHomeActivity(loggedInUserId)
-                    }
-                } else {
-                    Log.d(TAG, "Log In Unsuccessful")
-                    Toast.makeText(mContext, getString(R.string.log_in_failed), Toast.LENGTH_SHORT).show()
+                showLogInProgress(true)
+                validateDataAndLogin()
+            }
+        }
+    }
+
+    private fun observeLogInStatus() {
+        userViewModel.logInSuccessful.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Response.Success -> {
+                    Log.d(TAG, "Log In Successful ${response.data}")
+                    showLogInProgress(false)
+                    launchHomeActivity()
+                }
+                is Response.Error -> {
+                    Log.d(TAG, "Log In Unsuccessful ${response.errorMessage}")
+                    showLogInProgress(false)
+                    Toast.makeText(
+                        mContext,
+                        getString(R.string.log_in_failed) + " " + response.errorMessage + getString(R.string.try_again),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                else -> {
+                    Log.d(TAG, "Log In progress $response")
                 }
             }
         }
     }
 
-    private fun launchHomeActivity(userId: String) {
-        val intent = Intent(mContext, HomeActivity::class.java)
-        intent.putExtra("userId", userId)
-        startActivity(intent)
-        requireActivity().finish()
+    private fun showLogInProgress(progress: Boolean) {
+        Log.d(TAG, "showLogInProgress")
+        viewBinding?.apply {
+            if (progress) {
+                logInProgressBar.visibility = View.VISIBLE
+                logInProgressBar.bringToFront()
+                logInCredentialsLayout.alpha = DIM_VIEW
+                emailOrMobile.isEnabled = false
+                logInPassword.isEnabled = false
+                goToSignUp.isEnabled = false
+                logInButton.isClickable = false
+            } else {
+                logInProgressBar.visibility = View.GONE
+                logInCredentialsLayout.alpha = NORMAL_VIEW
+                emailOrMobile.isEnabled = true
+                logInPassword.isEnabled = true
+                goToSignUp.isEnabled = true
+                logInButton.isClickable = true
+            }
+        }
     }
 
-    private fun validateDataAndLogin(): Boolean {
+    private fun launchHomeActivity() {
+        val userId = userViewModel.getCurrentUserId()
+        if (userId != null) {
+            val intent = Intent(mContext, HomeActivity::class.java)
+            intent.putExtra("userId", userId)
+            startActivity(intent)
+            requireActivity().finish()
+        } else {
+            Toast.makeText(mContext, getString(R.string.log_in_failed) + " " + getString(R.string.try_again), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun validateDataAndLogin() {
         Log.d(TAG, "validateDataAndLogin")
 
         var valid = false
@@ -120,10 +164,10 @@ class LogInFragment : Fragment() {
             }
             if (valid) {
                 userViewModel.logIn(mEmailOrMobile, mPassword)
+            } else {
+                showLogInProgress(false)
             }
         }
-
-        return valid
     }
 
     private fun goToSignUpFragment() {
