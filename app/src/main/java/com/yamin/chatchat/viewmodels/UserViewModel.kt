@@ -39,6 +39,10 @@ class UserViewModel : ViewModel() {
     val signUpSuccessful: LiveData<Response<Pair<Boolean, String?>>>
         get() = _signUpSuccessful
 
+    private val _logInSuccessful = MutableLiveData<Response<Pair<Boolean, String?>>>()
+    val logInSuccessful: LiveData<Response<Pair<Boolean, String?>>>
+        get() = _logInSuccessful
+
     private val _errorMessage = MutableLiveData<String>()
     val errorMessage: LiveData<String>
         get() = _errorMessage
@@ -77,6 +81,11 @@ class UserViewModel : ViewModel() {
         Log.d(TAG, "onCleared")
         super.onCleared()
         disposable.dispose()
+    }
+
+    fun resetLogInStatus() {
+        Log.d(TAG, "resetLogInStatus")
+        _logInSuccessful.postValue(Response.Idle)
     }
 
     fun resetSignUpStatus() {
@@ -123,16 +132,42 @@ class UserViewModel : ViewModel() {
         return errorMessage.value
     }
 
+    private fun observeLogInStatus() {
+        Log.d(TAG, "observeLogInStatus")
+
+        disposable.add(userRepository.isLogInSuccessful
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                if (it.isOnNext) {
+                    Log.d(TAG, "_logInSuccessful isOnNext")
+                    it.value?.let { status ->
+                        if (status.first) {
+                            Log.d(TAG, "isOnNext success")
+                            _logInSuccessful.postValue(Response.Success(status))
+                        } else {
+                            Log.d(TAG, "isOnNext error")
+                            _logInSuccessful.postValue(Response.Error(status.second!!))
+                        }
+                    }
+                } else if (it.isOnError) {
+                    Log.d(TAG, "_logInSuccessful isOnError")
+                    _logInSuccessful.postValue(Response.Error(it.value?.second!!))
+                }
+            })
+    }
+
     fun logIn(emailOrMobile: String, password: String) {
         Log.d(TAG, "logIn")
-
         viewModelScope.launch {
-            try {
-                userRepository.logInUserToApp(emailOrMobile, password)
-                _isSignedIn.postValue(true)
-            } catch (e: Exception) {
-                Log.d(TAG, "Log in unsuccessful", e)
-                _isSignedIn.postValue(false)
+            withContext(Dispatchers.IO) {
+                try {
+                    userRepository.logInUser(emailOrMobile, password)
+                    _isSignedIn.postValue(true)
+                } catch (e: Exception) {
+                    Log.d(TAG, "Log in unsuccessful", e)
+                    _isSignedIn.postValue(false)
+                }
             }
         }
     }

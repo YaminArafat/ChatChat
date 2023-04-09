@@ -34,6 +34,6 @@
     <string name="no_image_found">No image found</string>
     <string name="sign_up_failed">Sign Up failed.</string>
     <string name="try_again">Try again.</string>
-    <string name="log_in_failed">Log In failed. Try again.</string>
+    <string name="log_in_failed">Log In failed.</string>
     <string name="image_file_error">Image file does not exists or file can\'t be read</string>
 </resources>

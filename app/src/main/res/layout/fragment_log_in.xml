@@ -8,91 +8,130 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <FrameLayout
+            android:id="@+id/LogInMainLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical">
+            android:layout_gravity="center">
 
-            <ImageView
-                android:layout_width="@dimen/welcome_screen_icon_size"
-                android:layout_height="@dimen/welcome_screen_icon_size"
-                android:layout_gravity="center"
-                android:layout_margin="@dimen/welcome_screen_text_icon_margin"
-                android:background="@drawable/ic_baseline_chat_24"
-                android:contentDescription="@string/app_name" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/emailOrMobileLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/enter_email_or_mobile">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/emailOrMobile"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
-                    android:layout_marginVertical="@dimen/welcome_screen_button_margin"
-                    android:autofillHints="emailAddress"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/logInPasswordLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/enter_password"
-                app:passwordToggleDrawable="@drawable/ic_baseline_remove_red_eye_24"
-                app:passwordToggleEnabled="true">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/logInPassword"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
-                    android:autofillHints="password"
-                    android:inputType="textPassword" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
-                android:layout_marginTop="@dimen/login_screen_forgot_pass_margin"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/forgotPassword"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/login_screen_forgot_pass_margin"
-                    android:layout_marginTop="@dimen/welcome_screen_text_icon_margin"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:text="@string/forgot_password" />
-
-                <TextView
-                    android:id="@+id/goToSignUp"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/welcome_screen_text_icon_margin"
-                    android:layout_marginEnd="@dimen/login_screen_forgot_pass_margin"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:text="@string/new_here_sign_up"
-                    android:textAlignment="textEnd" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/logInButton"
+            <FrameLayout
+                android:id="@+id/logInProgressBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="@dimen/welcome_screen_button_margin"
-                android:backgroundTint="@color/blueOrchid"
-                android:text="@string/log_in" />
-        </LinearLayout>
+                android:visibility="invisible">
+
+                <ProgressBar
+                    android:id="@+id/progressBar1"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="@dimen/common_100dp"
+                    android:layout_height="@dimen/common_100dp"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/blueOrchid"
+                    android:visibility="visible" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar2"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="@dimen/common_70dp"
+                    android:layout_height="@dimen/common_70dp"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/blueIvy"
+                    android:rotation="180"
+                    android:visibility="visible" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/logInCredentialsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="@dimen/welcome_screen_icon_size"
+                    android:layout_height="@dimen/welcome_screen_icon_size"
+                    android:layout_gravity="center"
+                    android:layout_margin="@dimen/welcome_screen_text_icon_margin"
+                    android:background="@drawable/ic_baseline_chat_24"
+                    android:contentDescription="@string/app_name" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/emailOrMobileLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/enter_email_or_mobile">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/emailOrMobile"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+                        android:layout_marginVertical="@dimen/welcome_screen_button_margin"
+                        android:autofillHints="emailAddress"
+                        android:inputType="text" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/logInPasswordLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/enter_password"
+                    app:errorIconDrawable="@null"
+                    app:passwordToggleDrawable="@drawable/ic_baseline_remove_red_eye_24"
+                    app:passwordToggleEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/logInPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+                        android:autofillHints="password"
+                        android:inputType="textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/welcome_screen_text_icon_margin"
+                    android:layout_marginTop="@dimen/login_screen_forgot_pass_margin"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/forgotPassword"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/login_screen_forgot_pass_margin"
+                        android:layout_marginTop="@dimen/welcome_screen_text_icon_margin"
+                        android:layout_weight="1"
+                        android:clickable="true"
+                        android:text="@string/forgot_password" />
+
+                    <TextView
+                        android:id="@+id/goToSignUp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/welcome_screen_text_icon_margin"
+                        android:layout_marginEnd="@dimen/login_screen_forgot_pass_margin"
+                        android:layout_weight="1"
+                        android:clickable="true"
+                        android:text="@string/new_here_sign_up"
+                        android:textAlignment="textEnd" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/logInButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/welcome_screen_button_margin"
+                    android:backgroundTint="@color/blueOrchid"
+                    android:text="@string/log_in" />
+            </LinearLayout>
+
+        </FrameLayout>
     </ScrollView>
 
 </layout>

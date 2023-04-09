@@ -23,7 +23,7 @@
                 android:layout_height="@dimen/common_100dp"
                 android:layout_gravity="center"
                 android:indeterminate="true"
-                android:indeterminateTint="@color/blueIvy"
+                android:indeterminateTint="@color/blueOrchid"
                 android:visibility="visible" />
 
             <ProgressBar
@@ -39,6 +39,7 @@
         </FrameLayout>
 
         <LinearLayout
+            android:id="@+id/signUpCredentialsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
