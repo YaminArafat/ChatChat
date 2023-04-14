@@ -50,6 +50,7 @@ class UserViewModel : ViewModel() {
     init {
         Log.d(TAG, "init")
         observeSignUpStatus()
+        observeLogInStatus()
     }
 
     private fun observeSignUpStatus() {
@@ -198,7 +199,7 @@ class UserViewModel : ViewModel() {
     fun getCurrentUserId(): String? {
         Log.d(TAG, "getCurrentUserId")
 
-        _currentUserId.postValue(userRepository.getCurrentUserId())
+        _currentUserId.value = userRepository.getCurrentUserId()
         return currentUserId.value
     }
 
