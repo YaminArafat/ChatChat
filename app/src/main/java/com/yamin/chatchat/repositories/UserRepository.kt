@@ -1,5 +1,6 @@
 package com.yamin.chatchat.repositories
 
+import android.accounts.NetworkErrorException
 import android.util.Log
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
@@ -92,11 +93,12 @@ class UserRepository {
     }*/
 
     suspend fun logInUser(emailOrMobile: String, password: String) {
-        Log.d(TAG, "logInUserToApp")
+        Log.d(TAG, "logInUser")
 
         try {
             mAuth.signInWithEmailAndPassword(emailOrMobile, password).await()
-            _isLogInSuccessful.onNext(Notification.createOnNext(Pair(true, null)))
+            val userId = mAuth.currentUser?.uid ?: throw NetworkErrorException()
+            _isLogInSuccessful.onNext(Notification.createOnNext(Pair(true, userId)))
         } catch (e: Exception) {
             Log.d(TAG, "log In failed ${e.message}")
             e.printStackTrace()

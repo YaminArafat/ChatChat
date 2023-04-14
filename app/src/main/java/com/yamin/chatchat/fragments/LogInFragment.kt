@@ -48,7 +48,7 @@ class LogInFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d(TAG, "onViewCreated")
+        Log.d(TAG, "onCreateView")
 
         _viewBinding = FragmentLogInBinding.inflate(inflater, container, false)
         return viewBinding?.root
@@ -66,6 +66,7 @@ class LogInFragment : Fragment() {
             }
 
             logInButton.setOnClickListener {
+                Log.d(TAG, "logInButton clicked")
                 showLogInProgress(true)
                 validateDataAndLogin()
             }
@@ -73,12 +74,14 @@ class LogInFragment : Fragment() {
     }
 
     private fun observeLogInStatus() {
+        Log.d(TAG, "observeLogInStatus")
+
         userViewModel.logInSuccessful.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Success -> {
                     Log.d(TAG, "Log In Successful ${response.data}")
                     showLogInProgress(false)
-                    launchHomeActivity()
+                    launchHomeActivity(response.data.second)
                 }
                 is Response.Error -> {
                     Log.d(TAG, "Log In Unsuccessful ${response.errorMessage}")
@@ -118,8 +121,8 @@ class LogInFragment : Fragment() {
         }
     }
 
-    private fun launchHomeActivity() {
-        val userId = userViewModel.getCurrentUserId()
+    private fun launchHomeActivity(userId: String?) {
+        Log.d(TAG, "launchHomeActivity")
         if (userId != null) {
             val intent = Intent(mContext, HomeActivity::class.java)
             intent.putExtra("userId", userId)
@@ -180,9 +183,10 @@ class LogInFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        Log.d(TAG, "onViewCreated")
+        Log.d(TAG, "onDestroyView")
 
         super.onDestroyView()
+        userViewModel.resetLogInStatus()
         _viewBinding = null
     }
 
