@@ -50,8 +50,7 @@ class AppWelcomeScreenFragment : Fragment() {
     private fun launchSignUpFragment() {
         Log.d(TAG, "launchSignUpFragment")
 
-        val fragmentManager = parentFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, SignUpFragment())
+        val fragmentTransaction = parentFragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, SignUpFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
@@ -59,8 +58,7 @@ class AppWelcomeScreenFragment : Fragment() {
     private fun launchLogInFragment() {
         Log.d(TAG, "launchLogInFragment")
 
-        val fragmentManager = parentFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, LogInFragment())
+        val fragmentTransaction = parentFragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, LogInFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }

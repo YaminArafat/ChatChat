@@ -6,6 +6,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import com.yamin.chatchat.data.models.UserChatList
 import com.yamin.chatchat.data.models.User
 import io.reactivex.rxjava3.core.Notification
 import io.reactivex.rxjava3.core.Observable
@@ -17,7 +18,9 @@ import kotlinx.coroutines.withContext
 class UserRepository {
 
     private val mAuth = Firebase.auth
-    private val databaseRef = FirebaseDatabase.getInstance().reference.child("users")
+    private val userListDbRef = FirebaseDatabase.getInstance().reference.child("users")
+    private val userChatsDbRef = FirebaseDatabase.getInstance().reference.child("chats")
+
 
     private val _isSignUpSuccessful = PublishSubject.create<Notification<Pair<Boolean, String?>>>()
     val isSignUpSuccessful: Observable<Notification<Pair<Boolean, String?>>>
@@ -107,6 +110,17 @@ class UserRepository {
 
     }
 
+    suspend fun getUserChatsList(userId: String): UserChatList? {
+        return try {
+            val snapshot = userChatsDbRef.child(userId).get().await()
+            snapshot.getValue(UserChatList::class.java)
+        } catch (e: Exception) {
+            Log.d(TAG, "Error getting current user chats list", e)
+            e.printStackTrace()
+            null
+        }
+    }
+
     fun logOutUserFromApp() {
         Log.d(TAG, "logOutUserFromApp")
         mAuth.signOut()
@@ -118,7 +132,7 @@ class UserRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val currentUserId = mAuth.currentUser?.uid
-                val snapshot = currentUserId?.let { databaseRef.child(it).get().await() }
+                val snapshot = currentUserId?.let { userListDbRef.child(it).get().await() }
                 snapshot?.getValue(User::class.java)
             } catch (e: Exception) {
                 Log.d(TAG, "Error getting current user", e)
@@ -157,7 +171,7 @@ class UserRepository {
 
             val user = User(userId, email, profileImageDownloadUrl, firstName, lastName, mobile, password)
 
-            databaseRef.child(userId).setValue(user).await()
+            userListDbRef.child(userId).setValue(user).await()
             notifySignUpStatus(true)
         } catch (e: Exception) {
             Log.d(TAG, "Exception ${e.message}")
