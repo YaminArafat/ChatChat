@@ -203,6 +203,10 @@ class UserViewModel : ViewModel() {
         return currentUserId.value
     }
 
+    fun getUserChats(userId: String) {
+
+    }
+
     fun setImageData(data: ByteArray) {
         Log.d(TAG, "setImageData")
 

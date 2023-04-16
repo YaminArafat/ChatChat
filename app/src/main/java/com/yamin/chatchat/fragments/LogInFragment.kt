@@ -67,8 +67,9 @@ class LogInFragment : Fragment() {
 
             logInButton.setOnClickListener {
                 Log.d(TAG, "logInButton clicked")
-                showLogInProgress(true)
-                validateDataAndLogin()
+                launchHomeActivity("Yamin")
+                /*showLogInProgress(true)
+                validateDataAndLogin()*/
             }
         }
     }
@@ -176,8 +177,7 @@ class LogInFragment : Fragment() {
     private fun goToSignUpFragment() {
         Log.d(TAG, "goToSignUpFragment")
 
-        val fragmentManager = parentFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, SignUpFragment())
+        val fragmentTransaction = parentFragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, SignUpFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }

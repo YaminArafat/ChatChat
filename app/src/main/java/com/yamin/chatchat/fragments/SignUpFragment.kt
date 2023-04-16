@@ -279,8 +279,7 @@ class SignUpFragment : Fragment() {
     private fun goToLogInFragment() {
         Log.d(TAG, "goToLogInFragment")
 
-        val fragmentManager = requireActivity().supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, LogInFragment())
+        val fragmentTransaction = parentFragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, LogInFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
