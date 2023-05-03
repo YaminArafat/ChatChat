@@ -8,4 +8,6 @@ data class User(
     var lastName: String,
     var mobile: String,
     var password: String
-)
+) {
+    constructor() : this("", "", "", "", "", "", "")
+}

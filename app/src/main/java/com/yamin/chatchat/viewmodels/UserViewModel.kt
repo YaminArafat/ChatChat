@@ -168,6 +168,7 @@ class UserViewModel : ViewModel() {
                 } catch (e: Exception) {
                     Log.d(TAG, "Log in unsuccessful", e)
                     _isSignedIn.postValue(false)
+                    e.printStackTrace()
                 }
             }
         }
@@ -184,13 +185,16 @@ class UserViewModel : ViewModel() {
         Log.d(TAG, "getCurrentUserData")
 
         viewModelScope.launch {
-            try {
-                val user = userRepository.getCurrentUser()
-                user?.let {
-                    _currentUser.postValue(it)
+            withContext(Dispatchers.IO) {
+                try {
+                    val user = userRepository.getCurrentUser()
+                    user?.let {
+                        _currentUser.postValue(it)
+                    }
+                } catch (e: Exception) {
+                    Log.d(TAG, "Error getting current user", e)
+                    e.printStackTrace()
                 }
-            } catch (e: Exception) {
-                Log.d(TAG, "Error getting current user", e)
             }
         }
         return currentUser.value
@@ -201,10 +205,6 @@ class UserViewModel : ViewModel() {
 
         _currentUserId.value = userRepository.getCurrentUserId()
         return currentUserId.value
-    }
-
-    fun getUserChats(userId: String) {
-
     }
 
     fun setImageData(data: ByteArray) {

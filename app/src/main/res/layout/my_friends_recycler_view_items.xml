@@ -7,6 +7,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
         android:orientation="horizontal"
         android:padding="@dimen/common_10dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -15,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/chatsProfilePic"
+            android:id="@+id/friendsProfilePic"
             android:layout_width="@dimen/common_60dp"
             android:layout_height="@dimen/common_60dp"
             android:layout_alignParentStart="true"
@@ -28,12 +30,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:layout_toStartOf="@id/chatIcon"
-            android:layout_toEndOf="@id/chatsProfilePic"
+            android:layout_toStartOf="@id/actionButton"
+            android:layout_toEndOf="@id/friendsProfilePic"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/chatsProfileName"
+                android:id="@+id/friendsProfileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
@@ -43,17 +45,17 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/chatsMessages"
+                android:id="@+id/friendsEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/common_20dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Mutual Friends" />
+                android:text="@string/email" />
 
         </LinearLayout>
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <!--<de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/chatIcon"
             android:layout_width="@dimen/common_40dp"
             android:layout_height="@dimen/common_40dp"
@@ -61,8 +63,18 @@
             android:layout_centerVertical="true"
             android:background="@drawable/blue_circle"
             android:contentDescription="@string/chats"
-            android:tag="Default" />
+            android:tag="Default" />-->
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/actionButton"
+            android:layout_width="@dimen/common_40dp"
+            android:layout_height="@dimen/common_40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/send_request"
+            android:src="@drawable/ic_baseline_message_24"
+            android:tag="Default"
+            app:fabSize="mini" />
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
