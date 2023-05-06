@@ -79,7 +79,8 @@
             android:layout_centerVertical="true"
             android:background="@drawable/blue_circle"
             android:contentDescription="@string/profile_picture"
-            android:tag="Default" />
+            android:tag="Default"
+            android:visibility="invisible" />
 
     </RelativeLayout>
 

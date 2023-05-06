@@ -9,27 +9,28 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.yamin.chatchat.R
-import com.yamin.chatchat.adapters.MyFriendsRecyclerViewAdapter
-import com.yamin.chatchat.data.models.Friend
-import com.yamin.chatchat.databinding.FragmentMyFriendsBinding
+import com.yamin.chatchat.adapters.ChatsTabRecyclerViewAdapter
+import com.yamin.chatchat.data.models.Chats
+import com.yamin.chatchat.databinding.FragmentChatsTabBinding
 import com.yamin.chatchat.helpers.OnItemClickListener
 import com.yamin.chatchat.utils.Response
-import com.yamin.chatchat.viewmodels.FriendsViewModel
+import com.yamin.chatchat.viewmodels.ChatsViewModel
+
 
 /**
  * A simple [Fragment] subclass.
- * Use the [MyFriendsFragment.newInstance] factory method to
+ * Use the [ChatsTabFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class MyFriendsFragment : Fragment(), OnItemClickListener {
+class ChatsTabFragment : Fragment(), OnItemClickListener {
 
-    private var _viewBinding: FragmentMyFriendsBinding? = null
+    private var _viewBinding: FragmentChatsTabBinding? = null
     private val viewBinding get() = _viewBinding
 
-    private val friendsViewModel: FriendsViewModel by activityViewModels()
-
-    private lateinit var myFriendsRecyclerViewAdapter: MyFriendsRecyclerViewAdapter
-    private lateinit var myFriendsList: ArrayList<Friend>
+    private val chatsViewModel: ChatsViewModel by activityViewModels()
+    private lateinit var chatsList: ArrayList<Chats>
+    private lateinit var currentUserId: String
+    private lateinit var chatsTabRecyclerAdapter: ChatsTabRecyclerViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,30 +41,31 @@ class MyFriendsFragment : Fragment(), OnItemClickListener {
         savedInstanceState: Bundle?
     ): View? {
         Log.d(TAG, "onCreateView")
-        _viewBinding = FragmentMyFriendsBinding.inflate(inflater, container, false)
+        _viewBinding = FragmentChatsTabBinding.inflate(inflater, container, false)
         return viewBinding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Log.d(TAG, "onViewCreated")
         super.onViewCreated(view, savedInstanceState)
-        observeMyFriendList()
-        myFriendsList = friendsViewModel.getMyFriendsList()
+        observeChatsList()
+        chatsList = chatsViewModel.getUserChatsList()
+        currentUserId = chatsViewModel.getCurrentUserId().toString()
         viewBinding?.apply {
-            myFriendsRecyclerViewAdapter = MyFriendsRecyclerViewAdapter(myFriendsList, this@MyFriendsFragment)
-            myFriendsRecyclerView.layoutManager = LinearLayoutManager(context)
-            myFriendsRecyclerView.adapter = myFriendsRecyclerViewAdapter
+            chatsTabRecyclerAdapter = ChatsTabRecyclerViewAdapter(chatsList, currentUserId, this@ChatsTabFragment)
+            chatsTabRecyclerView.layoutManager = LinearLayoutManager(context)
+            chatsTabRecyclerView.adapter = chatsTabRecyclerAdapter
         }
     }
 
-    private fun observeMyFriendList() {
-        Log.d(TAG, "onViewCreated")
-        friendsViewModel.myFriendList.observe(viewLifecycleOwner) {
+    private fun observeChatsList() {
+        Log.d(TAG, "observeChatsList")
+        chatsViewModel.chatsList.observe(viewLifecycleOwner) {
             when (it) {
                 is Response.Success -> {
                     Log.d(TAG, "Response.Success ${it.data}")
-                    myFriendsList = it.data
-                    myFriendsRecyclerViewAdapter.updateData(myFriendsList)
+                    chatsList = it.data
+                    chatsTabRecyclerAdapter.updateData(chatsList)
                 }
                 is Response.Error -> {
                     ///TODO
@@ -76,7 +78,12 @@ class MyFriendsFragment : Fragment(), OnItemClickListener {
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
-        friendsViewModel.getMyFriendsList()
+        chatsViewModel.getUserChatsList()
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "onPause")
+        super.onPause()
     }
 
     override fun onDestroyView() {
@@ -100,6 +107,6 @@ class MyFriendsFragment : Fragment(), OnItemClickListener {
     }
 
     companion object {
-        const val TAG = "MyFriendsFragment"
+        const val TAG = "ChatsTabFragment"
     }
 }

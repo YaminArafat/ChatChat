@@ -9,10 +9,10 @@ import com.yamin.chatchat.R
 
 /**
  * A simple [Fragment] subclass.
- * Use the [ActiveFriendsFragment.newInstance] factory method to
+ * Use the [ActiveFriendsTabFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ActiveFriendsFragment : Fragment() {
+class ActiveFriendsTabFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,10 +23,10 @@ class ActiveFriendsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_active_friends, container, false)
+        return inflater.inflate(R.layout.fragment_active_friends_tab, container, false)
     }
 
     companion object {
-
+        const val TAG = "ActiveFriendsTabFragment"
     }
 }

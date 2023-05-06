@@ -14,8 +14,8 @@ class FriendsRepository {
 
     private val mAuth = Firebase.auth
     private val availableUsersDbRef = FirebaseDatabase.getInstance().getReference("users_public")
-    private val friendListDbRef = FirebaseDatabase.getInstance().reference.child("friends")
-    private val friendRequestDbRef = FirebaseDatabase.getInstance().reference.child("friend_requests")
+    private val friendListDbRef = FirebaseDatabase.getInstance().getReference("friends")
+    private val friendRequestDbRef = FirebaseDatabase.getInstance().getReference("friend_requests")
 
     private val _myFriendList = PublishSubject.create<Notification<ArrayList<Friend>>>()
     val myFriendList: Observable<Notification<ArrayList<Friend>>>
@@ -173,9 +173,8 @@ class FriendsRepository {
         Log.d(TAG, "getMyFriendsList")
         val myFriendList = arrayListOf<Friend>()
         try {
-            val currentUserId = mAuth.currentUser?.uid
-            currentUserId?.let { userId ->
-                val snapshot = friendListDbRef.child(userId).get().await()
+            mAuth.currentUser?.uid?.let { currentUserId ->
+                val snapshot = friendListDbRef.child(currentUserId).get().await()
                 for (childSnapshot in snapshot.children) {
                     val friend = childSnapshot.getValue(Friend::class.java)
                     friend?.let {

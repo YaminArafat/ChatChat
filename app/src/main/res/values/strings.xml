@@ -48,4 +48,6 @@
     <string name="sent_requests">Sent Requests</string>
     <string name="add_friends">Add Friends</string>
     <string name="my_friends">My Friends</string>
+    <string name="enter_message">Enter Message</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam ac convallis ligula. Vivamus sed iaculis felis, et suscipit turpis. Vestibulum posuere enim quis orci fringilla blandit. Sed et viverra massa, sit amet pretium magna. Sed viverra dui non elementum scelerisque. Donec lacus ante, dignissim eu rutrum quis, lacinia sed tortor. Morbi quis erat at quam fermentum eleifend. Curabitur eu nulla leo. In vitae faucibus augue. Duis nec lacus ligula.</string>
 </resources>

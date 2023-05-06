@@ -5,9 +5,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.yamin.chatchat.R
-import com.yamin.chatchat.fragments.ActiveFriendsFragment
-import com.yamin.chatchat.fragments.ChatsFragment
-import com.yamin.chatchat.fragments.FriendsFragment
+import com.yamin.chatchat.fragments.ActiveFriendsTabFragment
+import com.yamin.chatchat.fragments.ChatsTabFragment
+import com.yamin.chatchat.fragments.FriendsTabFragment
 
 class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) : FragmentStateAdapter(fragmentManager, lifecycle) {
     override fun getItemCount(): Int {
@@ -16,9 +16,9 @@ class ViewPagerAdapter(fragmentManager: FragmentManager, lifecycle: Lifecycle) :
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> ChatsFragment()
-            1 -> ActiveFriendsFragment()
-            2 -> FriendsFragment()
+            0 -> ChatsTabFragment()
+            1 -> ActiveFriendsTabFragment()
+            2 -> FriendsTabFragment()
             else -> throw IllegalArgumentException("Invalid position: $position")
         }
     }

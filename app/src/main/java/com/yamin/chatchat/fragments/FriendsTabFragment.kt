@@ -7,16 +7,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.yamin.chatchat.R
-import com.yamin.chatchat.databinding.FragmentFriendsBinding
+import com.yamin.chatchat.databinding.FragmentFriendsTabBinding
 
 /**
  * A simple [Fragment] subclass.
- * Use the [FriendsFragment.newInstance] factory method to
+ * Use the [FriendsTabFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FriendsFragment : Fragment() {
+class FriendsTabFragment : Fragment() {
 
-    private var _viewBinding: FragmentFriendsBinding? = null
+    private var _viewBinding: FragmentFriendsTabBinding? = null
     private val viewBinding get() = _viewBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,7 +28,7 @@ class FriendsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         Log.d(TAG, "onCreateView")
-        _viewBinding = FragmentFriendsBinding.inflate(inflater, container, false)
+        _viewBinding = FragmentFriendsTabBinding.inflate(inflater, container, false)
         return viewBinding?.root
     }
 
@@ -73,25 +73,25 @@ class FriendsFragment : Fragment() {
     }
 
     private fun switchToSentRequestsFragment() {
-        val fragmentTransaction = childFragmentManager.beginTransaction().replace(R.id.friends_fragment_fragment_container, SentRequestsFragment())
+        val fragmentTransaction = childFragmentManager.beginTransaction().replace(R.id.friends_tab_fragment_container, SentRequestsFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
 
     private fun switchToMyRequestsFragment() {
-        val fragmentTransaction = childFragmentManager.beginTransaction().replace(R.id.friends_fragment_fragment_container, MyRequestsFragment())
+        val fragmentTransaction = childFragmentManager.beginTransaction().replace(R.id.friends_tab_fragment_container, MyRequestsFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
 
     private fun switchToMyFriendsFragment() {
-        val fragmentTransaction = childFragmentManager.beginTransaction().replace(R.id.friends_fragment_fragment_container, MyFriendsFragment())
+        val fragmentTransaction = childFragmentManager.beginTransaction().replace(R.id.friends_tab_fragment_container, MyFriendsFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
 
     private fun switchToAddFriendsFragment() {
-        val fragmentTransaction = childFragmentManager.beginTransaction().replace(R.id.friends_fragment_fragment_container, AddFriendsFragment())
+        val fragmentTransaction = childFragmentManager.beginTransaction().replace(R.id.friends_tab_fragment_container, AddFriendsFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }
@@ -103,6 +103,6 @@ class FriendsFragment : Fragment() {
     }
 
     companion object {
-        const val TAG = "FriendsFragment"
+        const val TAG = "FriendsTabFragment"
     }
 }
