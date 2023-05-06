@@ -98,6 +98,11 @@ class SentRequestsFragment : Fragment(), OnItemClickListener {
         }
     }
 
+    override fun onResume() {
+        Log.d(TAG, "onResume")
+        super.onResume()
+        friendsViewModel.getSentRequestsList()
+    }
 
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView")

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".fragments.FriendsFragment">
+    tools:context=".fragments.FriendsTabFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,7 +21,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:text="@string/friend_requests"
-                android:textColor="@color/blueOrchid"
+                android:textColor="?attr/colorPrimaryVariant"
                 android:textSize="@dimen/text_size_16sp" />
 
             <TextView
@@ -35,15 +33,20 @@
                 android:focusable="true"
                 android:tag="@string/add_friends"
                 android:text="@string/add_friends"
-                android:textColor="@color/blueOrchid"
+                android:textColor="?attr/colorPrimaryVariant"
                 android:textSize="@dimen/text_size_16sp" />
 
         </FrameLayout>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/blueOrchid" />
+
         <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/friends_fragment_fragment_container"
+            android:id="@+id/friends_tab_fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>
 
-</FrameLayout>
+</layout>
