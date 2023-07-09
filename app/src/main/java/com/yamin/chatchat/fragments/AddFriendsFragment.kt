@@ -48,6 +48,7 @@ class AddFriendsFragment : Fragment(), OnItemClickListener {
         Log.d(TAG, "onViewCreated")
         super.onViewCreated(view, savedInstanceState)
         observeAvailableUserList()
+        observeAvailableUserListChange()
         observeSendRequestStatus()
         availableUserList = friendsViewModel.getAvailableUserList()
         Log.d(TAG, "userList $availableUserList")
@@ -58,11 +59,31 @@ class AddFriendsFragment : Fragment(), OnItemClickListener {
         }
     }
 
+    private fun observeAvailableUserListChange() {
+        Log.d(TAG, "observeAvailableUserListChange")
+
+        friendsViewModel.availableUserListChange.observe(viewLifecycleOwner) {
+            when (it) {
+                is Response.Success -> {
+                    Log.d(TAG, "Response.Success ${it.data}")
+                    if (it.data) {
+                        friendsViewModel.getAvailableUserList()
+                    }
+                }
+                is Response.Error -> {
+
+                }
+                else -> {}
+            }
+        }
+    }
+
     private fun observeSendRequestStatus() {
         Log.d(TAG, "observeSendRequestStatus")
         friendsViewModel.sendRequestStatus.observe(viewLifecycleOwner) {
             when (it) {
                 is Response.Success -> {
+                    Log.d(TAG, "Response.Success ${it.data}")
                     if (it.data) {
                         getUpdatedListData()
                     }
@@ -78,7 +99,7 @@ class AddFriendsFragment : Fragment(), OnItemClickListener {
     private fun getUpdatedListData() {
         Log.d(TAG, "getUpdatedListData")
         friendsViewModel.apply {
-            getSentRequestsList()
+            // getSentRequestsList()
             getAvailableUserList()
         }
     }
@@ -104,6 +125,16 @@ class AddFriendsFragment : Fragment(), OnItemClickListener {
 
     override fun onClick(userId: String) {
         friendsViewModel.sendFriendRequest(userId)
+    }
+
+    override fun onResume() {
+        Log.d(TAG, "onResume")
+        super.onResume()
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "onPause")
+        super.onPause()
     }
 
     override fun onDestroyView() {

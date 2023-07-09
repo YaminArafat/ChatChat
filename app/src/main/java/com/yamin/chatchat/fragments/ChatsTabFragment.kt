@@ -1,5 +1,6 @@
 package com.yamin.chatchat.fragments
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -33,6 +34,7 @@ class ChatsTabFragment : Fragment(), OnItemClickListener {
     private lateinit var chatsTabRecyclerAdapter: ChatsTabRecyclerViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
     }
 
@@ -78,12 +80,17 @@ class ChatsTabFragment : Fragment(), OnItemClickListener {
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
-        chatsViewModel.getUserChatsList()
+        // chatsViewModel.getUserChatsList()
     }
 
     override fun onPause() {
         Log.d(TAG, "onPause")
         super.onPause()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        Log.d(TAG, "onConfigurationChanged")
+        super.onConfigurationChanged(newConfig)
     }
 
     override fun onDestroyView() {
@@ -101,7 +108,7 @@ class ChatsTabFragment : Fragment(), OnItemClickListener {
     private fun launchMessagesFragment(bundle: Bundle) {
         val messagesFragment = MessagesFragment()
         messagesFragment.arguments = bundle
-        val fragmentTransaction = childFragmentManager.beginTransaction().replace(R.id.home_activity_fragment_container, messagesFragment)
+        val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().replace(R.id.home_activity_fragment_container, messagesFragment)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }

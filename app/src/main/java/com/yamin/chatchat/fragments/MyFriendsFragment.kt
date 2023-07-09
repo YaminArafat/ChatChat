@@ -57,7 +57,7 @@ class MyFriendsFragment : Fragment(), OnItemClickListener {
     }
 
     private fun observeMyFriendList() {
-        Log.d(TAG, "onViewCreated")
+        Log.d(TAG, "observeMyFriendList")
         friendsViewModel.myFriendList.observe(viewLifecycleOwner) {
             when (it) {
                 is Response.Success -> {
@@ -76,7 +76,12 @@ class MyFriendsFragment : Fragment(), OnItemClickListener {
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
-        friendsViewModel.getMyFriendsList()
+        // friendsViewModel.getMyFriendsList()
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "onPause")
+        super.onPause()
     }
 
     override fun onDestroyView() {
@@ -94,7 +99,7 @@ class MyFriendsFragment : Fragment(), OnItemClickListener {
     private fun launchMessagesFragment(bundle: Bundle) {
         val messagesFragment = MessagesFragment()
         messagesFragment.arguments = bundle
-        val fragmentTransaction = childFragmentManager.beginTransaction().replace(R.id.home_activity_fragment_container, messagesFragment)
+        val fragmentTransaction = requireActivity().supportFragmentManager.beginTransaction().replace(R.id.home_activity_fragment_container, messagesFragment)
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
     }

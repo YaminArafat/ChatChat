@@ -24,6 +24,7 @@ class HomeFragment : Fragment() {
     private var userId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG, "onCreate")
         super.onCreate(savedInstanceState)
     }
 
@@ -59,6 +60,16 @@ class HomeFragment : Fragment() {
             }.attach()
         }
 
+    }
+
+    override fun onResume() {
+        Log.d(TAG, "onResume")
+        super.onResume()
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "onPause")
+        super.onPause()
     }
 
     override fun onDestroyView() {

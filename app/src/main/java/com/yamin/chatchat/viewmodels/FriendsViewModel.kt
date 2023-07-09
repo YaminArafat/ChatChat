@@ -27,6 +27,10 @@ class FriendsViewModel : ViewModel() {
     val availableUserList: LiveData<Response<ArrayList<Friend>>>
         get() = _availableUserList
 
+    private val _availableUserListChange = MutableLiveData<Response<Boolean>>()
+    val availableUserListChange: LiveData<Response<Boolean>>
+        get() = _availableUserListChange
+
     private val _myRequestsList = MutableLiveData<Response<ArrayList<Friend>>>()
     val myRequestsList: LiveData<Response<ArrayList<Friend>>>
         get() = _myRequestsList
@@ -53,8 +57,15 @@ class FriendsViewModel : ViewModel() {
         observeAcceptRequestStatus()
         observeMyFriendList()
         observeAvailableUserList()
+        observeAvailableUserListChange()
         observeMyRequestsList()
         observeSentRequestsList()
+        registerEventListenersForRealTimeDbChanges()
+    }
+
+    private fun registerEventListenersForRealTimeDbChanges() {
+        Log.d(TAG, "registerEventListenersForRealTimeDbChanges")
+        friendsRepository.registerEventChangeListeners()
     }
 
     private fun observeAcceptRequestStatus() {
@@ -166,6 +177,23 @@ class FriendsViewModel : ViewModel() {
             })
     }
 
+    private fun observeAvailableUserListChange() {
+        Log.d(TAG, "observeAvailableUserListChange")
+
+        disposable.add(friendsRepository.availableUserListChange
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                if (it.isOnError) {
+                    Log.d(TAG, "observeAvailableUserListChange isOnError")
+                    _availableUserListChange.postValue(Response.Error(it.error?.message!!))
+                } else {
+                    Log.d(TAG, "observeAvailableUserListChange isOnError")
+                    _availableUserListChange.postValue(Response.Success(it.value!!))
+                }
+            })
+    }
+
     private fun observeMyFriendList() {
         Log.d(TAG, "observeMyFriendList")
 
@@ -227,9 +255,6 @@ class FriendsViewModel : ViewModel() {
         }
     }
 
-    fun startChat(friendId: String) {
-
-    }
 
     fun getAvailableUserList(): ArrayList<Friend> {
         Log.d(TAG, "getAvailableUserList")
@@ -307,6 +332,7 @@ class FriendsViewModel : ViewModel() {
         Log.d(TAG, "onCleared")
         super.onCleared()
         disposable.dispose()
+        friendsRepository.removeAllEventListeners()
     }
 
     companion object {

@@ -20,12 +20,19 @@ class ChatsViewModel : ViewModel() {
     private val chatsRepository = ChatsRepository()
     private var disposable = CompositeDisposable()
 
+    private val registeredLiveMessageObservers: ArrayList<String> = ArrayList()
+
     private val _chatsList = MutableLiveData<Response<ArrayList<Chats>>>()
     val chatsList: LiveData<Response<ArrayList<Chats>>>
         get() = _chatsList
 
+    private val _getFullConversationStatus = MutableLiveData<Response<Pair<Boolean, ArrayList<Message>>>>()
+    val getFullConversationStatus: LiveData<Response<Pair<Boolean, ArrayList<Message>>>>
+        get() = _getFullConversationStatus
+
     init {
         observeChatsList()
+        registerLiveChatsListObserver()
     }
 
     fun sendMessageToReceiver(message: String, receiverId: String, timestamp: Long) {
@@ -60,17 +67,32 @@ class ChatsViewModel : ViewModel() {
             })
     }
 
-    fun activateLiveMessageObserver(receiverId: String) {
-        Log.d(TAG, "activateLiveMessageObserver")
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    chatsRepository.observeLiveMessages(receiverId)
-                } catch (e: Exception) {
-                    Log.d(TAG, "Error activating LiveMessageObserver", e)
-                    e.printStackTrace()
+    fun registerLiveMessageObserver(receiverId: String) {
+        Log.d(TAG, "registerLiveMessageObserver")
+        if (!registeredLiveMessageObservers.contains(receiverId)) {
+            Log.d(TAG, "registerLiveMessageObserver not exists")
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    try {
+                        Log.d(TAG, "creating new registerLiveMessageObserver")
+                        chatsRepository.observeLiveMessages(receiverId)
+                        registeredLiveMessageObservers.add(receiverId)
+                    } catch (e: Exception) {
+                        Log.d(TAG, "Error activating LiveMessageObserver", e)
+                        e.printStackTrace()
+                    }
                 }
             }
+        }
+    }
+
+    private fun registerLiveChatsListObserver() {
+        Log.d(TAG, "registerLiveChatsListObserver")
+        try {
+            chatsRepository.observeLiveChatsList()
+        } catch (e: Exception) {
+            Log.d(TAG, "Error activating registerLiveChatsListObserver", e)
+            e.printStackTrace()
         }
     }
 
@@ -83,13 +105,11 @@ class ChatsViewModel : ViewModel() {
             .subscribe {
                 if (it.isOnError) {
                     Log.d(TAG, "getLiveMessage isOnError")
-                    liveMessage.postValue(Response.Error(it.error?.message!!))
-                    return@subscribe
+                    liveMessage.value = (Response.Error(it.error?.message!!))
                 } else {
                     Log.d(TAG, "getLiveMessage isOnNext")
                     it.value?.let { result ->
-                        liveMessage.postValue(Response.Success(result))
-                        return@subscribe
+                        liveMessage.value = (Response.Success(result))
                     }
                 }
             })
@@ -103,9 +123,11 @@ class ChatsViewModel : ViewModel() {
             withContext(Dispatchers.IO) {
                 try {
                     fullConversation = chatsRepository.getFullConversation(friendId)
+                    _getFullConversationStatus.postValue(Response.Success(Pair(true, fullConversation)))
                 } catch (e: Exception) {
                     Log.d(TAG, "Error updating conversation", e)
                     e.printStackTrace()
+                    _getFullConversationStatus.postValue(Response.Error(e.message.toString()))
                 }
             }
         }
@@ -139,6 +161,8 @@ class ChatsViewModel : ViewModel() {
         Log.d(TAG, "onCleared")
         super.onCleared()
         disposable.dispose()
+        registeredLiveMessageObservers.clear()
+        chatsRepository.removeAllEventListeners()
     }
 
     companion object {

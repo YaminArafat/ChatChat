@@ -6,4 +6,6 @@ data class Chats(
     var userLastName: String,
     var userProfileImage: String,
     var lastMessage: Message
-)
+) {
+    constructor() : this("", "", "", "", Message())
+}

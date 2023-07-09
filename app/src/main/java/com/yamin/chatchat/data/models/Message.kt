@@ -5,4 +5,6 @@ data class Message(
     var messageText: String,
     var receiverId: String,
     var messageTimestamp: Long
-)
+) {
+    constructor() : this("", "", "", 0)
+}
