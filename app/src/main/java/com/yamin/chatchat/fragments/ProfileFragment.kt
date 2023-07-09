@@ -29,7 +29,6 @@ class ProfileFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
 
-
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()

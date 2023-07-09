@@ -58,6 +58,7 @@ class MyFriendsFragment : Fragment(), OnItemClickListener {
 
     private fun observeMyFriendList() {
         Log.d(TAG, "observeMyFriendList")
+        
         friendsViewModel.myFriendList.observe(viewLifecycleOwner) {
             when (it) {
                 is Response.Success -> {

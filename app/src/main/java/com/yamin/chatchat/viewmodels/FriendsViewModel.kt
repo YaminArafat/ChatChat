@@ -255,7 +255,6 @@ class FriendsViewModel : ViewModel() {
         }
     }
 
-
     fun getAvailableUserList(): ArrayList<Friend> {
         Log.d(TAG, "getAvailableUserList")
 
