@@ -67,9 +67,8 @@ class LogInFragment : Fragment() {
 
             logInButton.setOnClickListener {
                 Log.d(TAG, "logInButton clicked")
-                launchHomeActivity("Yamin")
-                /*showLogInProgress(true)
-                validateDataAndLogin()*/
+                showLogInProgress(true)
+                validateDataAndLogin()
             }
         }
     }
@@ -180,6 +179,16 @@ class LogInFragment : Fragment() {
         val fragmentTransaction = parentFragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, SignUpFragment())
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
+    }
+
+    override fun onResume() {
+        Log.d(TAG, "onResume")
+        super.onResume()
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "onPause")
+        super.onPause()
     }
 
     override fun onDestroyView() {

@@ -133,6 +133,11 @@ class SignUpFragment : Fragment() {
         super.onResume()
     }
 
+    override fun onPause() {
+        Log.d(TAG, "onPause")
+        super.onPause()
+    }
+
     override fun onAttach(context: Context) {
         Log.d(TAG, "onAttach")
 

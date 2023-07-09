@@ -63,6 +63,17 @@ class AppWelcomeScreenFragment : Fragment() {
         fragmentTransaction.commit()
     }
 
+
+    override fun onResume() {
+        Log.d(TAG, "onResume")
+        super.onResume()
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "onPause")
+        super.onPause()
+    }
+
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView")
 

@@ -78,7 +78,7 @@ class MyRequestsFragment : Fragment(), OnItemClickListener {
         Log.d(TAG, "getUpdatedListData")
         friendsViewModel.apply {
             getMyRequestsList()
-            getMyFriendsList()
+            // getMyFriendsList()
         }
     }
 
@@ -102,7 +102,12 @@ class MyRequestsFragment : Fragment(), OnItemClickListener {
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
-        friendsViewModel.getMyRequestsList()
+        // friendsViewModel.getMyRequestsList()
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "onPause")
+        super.onPause()
     }
 
     override fun onDestroyView() {

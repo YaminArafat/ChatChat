@@ -1,11 +1,14 @@
 package com.yamin.chatchat.repositories
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.ktx.Firebase
 import com.yamin.chatchat.data.models.Chats
 import com.yamin.chatchat.data.models.Friend
@@ -23,9 +26,15 @@ class ChatsRepository {
     private val chatsKeysDbRef = FirebaseDatabase.getInstance().getReference("chats_keys")
     private val availableUsersDbRef = FirebaseDatabase.getInstance().getReference("users_public")
 
+    private var messageCount = 0
+
     private val _chatsList = PublishSubject.create<Notification<ArrayList<Chats>>>()
     val chatsList: Observable<Notification<ArrayList<Chats>>>
         get() = _chatsList
+
+    private val _currentChatsList = MutableLiveData<ArrayList<Chats>>()
+    val currentChatsList: LiveData<ArrayList<Chats>>
+        get() = _currentChatsList
 
     private val _liveMessage = PublishSubject.create<Notification<Message>>()
     val liveMessage: Observable<Notification<Message>>
@@ -71,21 +80,26 @@ class ChatsRepository {
                     val currentUserPublicData = currentUserSnapshot.getValue(Friend::class.java)
                     val friendPublicData = friendSnapshot.getValue(Friend::class.java)
                     conversationDbRef.addChildEventListener(object : ChildEventListener {
+                        var childCount = 0
                         override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                            val newMessage = snapshot.getValue(Message::class.java)
-                            newMessage?.let {
-                                _liveMessage.onNext(Notification.createOnNext(it))
-                                friendPublicData?.apply {
-                                    val chatSummaryCurrentUser = Chats(id, firstName, lastName, profileImage, it)
-                                    chatsListDbRef.child(currentUserId).child(chatKey).setValue(chatSummaryCurrentUser)
-                                }
-                                currentUserPublicData?.apply {
-                                    val chatSummaryFriend = Chats(id, firstName, lastName, profileImage, it)
-                                    chatsListDbRef.child(friendId).child(chatKey).setValue(chatSummaryFriend)
+                            Log.d(TAG, "conversationDbRef onChildAdded")
+                            childCount++
+                            if (childCount > messageCount) {
+                                val newMessage = snapshot.getValue(Message::class.java)
+                                newMessage?.let {
+                                    Log.d(TAG, "_liveMessage onNext")
+                                    _liveMessage.onNext(Notification.createOnNext(it))
+                                    friendPublicData?.apply {
+                                        val chatSummaryCurrentUser = Chats(id, firstName, lastName, profileImage, it)
+                                        chatsListDbRef.child(currentUserId).child(chatKey).setValue(chatSummaryCurrentUser)
+                                    }
+                                    currentUserPublicData?.apply {
+                                        val chatSummaryFriend = Chats(id, firstName, lastName, profileImage, it)
+                                        chatsListDbRef.child(friendId).child(chatKey).setValue(chatSummaryFriend)
+                                    }
                                 }
                             }
                         }
-
                         override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
                         override fun onChildRemoved(snapshot: DataSnapshot) {}
                         override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -101,9 +115,65 @@ class ChatsRepository {
         }
     }
 
+    private val liveChatsListListener = object : ChildEventListener {
+        override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+            Log.d(TAG, "liveChatsListListener onChildAdded")
+            val newChatSummary = snapshot.getValue(Chats::class.java)
+            val lastChatSummaryList = currentChatsList.value
+            if (lastChatSummaryList == null) {
+                val firstChat = arrayListOf<Chats>()
+                firstChat.add(newChatSummary!!)
+                _chatsList.onNext(Notification.createOnNext(firstChat))
+                _currentChatsList.postValue(firstChat)
+            } else {
+                lastChatSummaryList.let {
+                    it.add(newChatSummary!!)
+                    _chatsList.onNext(Notification.createOnNext(it))
+                    _currentChatsList.postValue(it)
+                }
+            }
+        }
+
+        override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+            Log.d(TAG, "liveChatsListListener onChildChanged")
+            val updatedChatSummary = snapshot.getValue(Chats::class.java)
+            val lastChatSummaryList = currentChatsList.value
+            lastChatSummaryList?.let { lastChatList ->
+                val previousChatSummaryIndex = lastChatList.indexOfFirst { it.userId == updatedChatSummary?.userId }
+                if (previousChatSummaryIndex != -1) {
+                    lastChatList[previousChatSummaryIndex] = updatedChatSummary!!
+                    _chatsList.onNext(Notification.createOnNext(lastChatList))
+                    _currentChatsList.postValue(lastChatList)
+                }
+            }
+        }
+
+        override fun onChildRemoved(snapshot: DataSnapshot) {}
+        override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+        override fun onCancelled(snapshot: DatabaseError) {}
+    }
+
+    fun observeLiveChatsList() {
+        Log.d(TAG, "observeLiveChatsList")
+        try {
+            mAuth.currentUser?.uid?.let { currentUserId ->
+                chatsListDbRef.child(currentUserId).addChildEventListener(liveChatsListListener)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun removeAllEventListeners() {
+        mAuth.currentUser?.uid?.let { currentUserId ->
+            chatsListDbRef.child(currentUserId).removeEventListener(liveChatsListListener)
+        }
+    }
+
     suspend fun getFullConversation(friendId: String): ArrayList<Message> {
         Log.d(TAG, "getFullConversation")
         val fullConversation = arrayListOf<Message>()
+        messageCount = 0
         try {
             mAuth.currentUser?.uid?.let { currentUserId ->
                 val chatKeySnapshot = chatsKeysDbRef.child(currentUserId).child(friendId).get().await()
@@ -114,7 +184,10 @@ class ChatsRepository {
                     val conversationSnapshot = sortConversationQuery.get().await()
                     for (childSnapshot in conversationSnapshot.children) {
                         val message = childSnapshot.getValue(Message::class.java)
-                        message?.let { fullConversation.add(it) }
+                        message?.let {
+                            fullConversation.add(it)
+                            messageCount++
+                        }
                     }
                 }
             }
@@ -134,13 +207,15 @@ class ChatsRepository {
                 val currentUserChatsListDbRef = chatsListDbRef.child(currentUserId)
                 val sortChatsListQuery = currentUserChatsListDbRef.orderByChild("lastMessage/messageTimestamp")
                 val snapshot = sortChatsListQuery.get().await()
-                for (childSnapshot in snapshot.children) {
-                    val chat = childSnapshot.getValue(Chats::class.java)
-                    chat?.let {
-                        chatList.add(it)
+                val genericTypeIndicator = object : GenericTypeIndicator<Map<String, Chats>>() {}
+                val chat = snapshot.getValue(genericTypeIndicator)
+                chat?.let {
+                    for ((_, chatInfo) in it) {
+                        chatList.add(chatInfo)
                     }
                 }
                 _chatsList.onNext(Notification.createOnNext(chatList))
+                _currentChatsList.postValue(chatList)
             }
 
         } catch (e: Exception) {

@@ -39,10 +39,11 @@ class MessagesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         Log.d(TAG, "onCreateView")
+        observeGetFullConversationStatus()
         userId = arguments?.getString("userId")
         userId?.let {
             fullConversationData = chatsViewModel.getConversationHistory(it)
-            chatsViewModel.activateLiveMessageObserver(it)
+            chatsViewModel.registerLiveMessageObserver(it)
         }
         _viewBinding = FragmentMessagesBinding.inflate(inflater, container, false)
         return viewBinding?.root
@@ -53,17 +54,60 @@ class MessagesFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observeLiveConversation()
         userId?.let { receiverId ->
+            Log.d(TAG, "userId : $userId fullConversationData : $fullConversationData")
+            if (fullConversationData.isNotEmpty()) {
+                launchRecyclerViewAdapter()
+            }
             viewBinding?.apply {
-                messagesRecyclerViewAdapter = MessagesRecyclerViewAdapter(fullConversationData, receiverId)
-                messagesRecyclerView.layoutManager = LinearLayoutManager(context)
-                messagesRecyclerView.adapter = messagesRecyclerViewAdapter
+                enterMessage.setOnClickListener {
+                    scrollToBottom()
+                }
                 sendButton.setOnClickListener {
                     val message = enterMessage.text.toString()
                     if (message.isNotBlank()) {
                         chatsViewModel.sendMessageToReceiver(message, receiverId, System.currentTimeMillis())
+                        enterMessage.setText("")
                     }
                 }
             }
+        }
+    }
+
+    private fun scrollToBottom() {
+        var lastPosition = 0
+        if (::messagesRecyclerViewAdapter.isInitialized) {
+            lastPosition = messagesRecyclerViewAdapter.itemCount - 1
+        }
+        if (lastPosition < 0) {
+            lastPosition = 0
+        }
+        viewBinding?.messagesRecyclerView?.scrollToPosition(lastPosition)
+    }
+
+    private fun observeGetFullConversationStatus() {
+        Log.d(TAG, "observeGetFullConversationStatus")
+        chatsViewModel.getFullConversationStatus.observe(viewLifecycleOwner) {
+            when (it) {
+                is Response.Success -> {
+                    Log.d(TAG, "observeGetFullConversationStatus Response.Success ${it.data}")
+                    fullConversationData = it.data.second
+                    launchRecyclerViewAdapter()
+                }
+                is Response.Error -> {
+                    ///TODO
+                }
+                else -> {}
+            }
+        }
+    }
+
+    private fun launchRecyclerViewAdapter() {
+        Log.d(TAG, "launchRecyclerViewAdapter")
+        viewBinding?.apply {
+            messagesRecyclerViewAdapter = MessagesRecyclerViewAdapter(fullConversationData, userId!!)
+            messagesRecyclerView.layoutManager = LinearLayoutManager(context)
+            messagesRecyclerView.adapter = messagesRecyclerViewAdapter
+            scrollToBottom()
         }
     }
 
@@ -74,7 +118,10 @@ class MessagesFragment : Fragment() {
             when (it) {
                 is Response.Success -> {
                     Log.d(TAG, "Response.Success ${it.data}")
-                    messagesRecyclerViewAdapter.updateConversation(it.data)
+                    if (::messagesRecyclerViewAdapter.isInitialized) {
+                        messagesRecyclerViewAdapter.updateConversation(it.data)
+                        scrollToBottom()
+                    }
                 }
                 is Response.Error -> {
                     ///TODO
@@ -87,9 +134,14 @@ class MessagesFragment : Fragment() {
     override fun onResume() {
         Log.d(TAG, "onResume")
         super.onResume()
-        userId?.let {
-            chatsViewModel.getConversationHistory(it)
-        }
+//        userId?.let {
+//            chatsViewModel.getConversationHistory(it)
+//        }
+    }
+
+    override fun onPause() {
+        Log.d(TAG, "onPause")
+        super.onPause()
     }
 
     override fun onDestroyView() {
