@@ -92,7 +92,7 @@ class ChatsTabFragment : Fragment(), OnItemClickListener {
         Log.d(TAG, "onConfigurationChanged")
         super.onConfigurationChanged(newConfig)
     }
-    
+
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView")
         super.onDestroyView()
